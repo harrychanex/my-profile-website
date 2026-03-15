@@ -30,13 +30,31 @@
   transform: scale(1.04);
 }
 
-/* ─── Marquee ─── */
+/* ─── Horizontal Marquee ─── */
 @keyframes marquee {
   0%   { transform: translateX(0); }
   100% { transform: translateX(-50%); }
 }
 .animate-marquee {
   animation: marquee 40s linear infinite;
+}
+
+/* ─── Vertical Flowing Text (About section - large background) ─── */
+@keyframes verticalFlow {
+  0%   { transform: translateY(0); }
+  100% { transform: translateY(-50%); }
+}
+.vertical-flow-track {
+  animation: verticalFlow 30s linear infinite;
+}
+
+/* ─── Vertical Flowing Text (About section - inline smaller) ─── */
+@keyframes verticalFlowInline {
+  0%   { transform: translateY(0); }
+  100% { transform: translateY(-50%); }
+}
+.vertical-flow-inline {
+  animation: verticalFlowInline 20s linear infinite;
 }
 
 /* ─── Nav arrows ─── */
@@ -50,6 +68,20 @@
 .nav-arrow:disabled {
   opacity: 0.15;
   cursor: not-allowed;
+}
+
+/* ─── Service card expanding line ─── */
+.service-card .group-hover\:w-full {
+  transition-timing-function: cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+/* ─── Magnetic button hover effect ─── */
+.magnetic-btn {
+  transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), background-color 0.3s ease;
+}
+.magnetic-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 40px rgba(255,255,255,0.1), 0 10px 30px rgba(0,0,0,0.3);
 }
 
 /* ─── Reduced motion ─── */

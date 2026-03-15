@@ -1,7 +1,10 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ChevronLeft, ChevronRight, Menu, X } from 'lucide-react';
 import './App.css';
+
+gsap.registerPlugin(ScrollTrigger);
 
 /* ─── Project Data ─── */
 const projects = [
@@ -47,6 +50,14 @@ const projects = [
   },
 ];
 
+/* ─── Vertical flowing text words ─── */
+const flowingWords = [
+  'Empathy', 'Clarity', 'Motion', 'Rhythm', 'Balance',
+  'Contrast', 'Depth', 'Flow', 'Harmony', 'Impact',
+  'Vision', 'Craft', 'Detail', 'Purpose', 'Story',
+  'Emotion', 'Space', 'Light', 'Form', 'Energy',
+];
+
 function App() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -54,11 +65,15 @@ function App() {
   const [mouse, setMouse] = useState({ x: 0, y: 0 });
   const cardsRef = useRef<(HTMLDivElement | null)[]>([]);
   const heroRef = useRef<HTMLElement>(null);
+  const statsRef = useRef<HTMLElement>(null);
+  const worksRef = useRef<HTMLElement>(null);
+  const aboutRef = useRef<HTMLElement>(null);
+  const servicesRef = useRef<HTMLElement>(null);
+  const ctaRef = useRef<HTMLElement>(null);
 
   /* ─── Mouse parallax tracking ─── */
   const handleMouseMove = useCallback((e: React.MouseEvent<HTMLElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
-    // Normalize to -1 … +1 from center
     const x = ((e.clientX - rect.left) / rect.width - 0.5) * 2;
     const y = ((e.clientY - rect.top) / rect.height - 0.5) * 2;
     setMouse({ x, y });
@@ -69,11 +84,9 @@ function App() {
     const diff = index - active;
     const absDiff = Math.abs(diff);
 
-    // Center card: flat, large, bright
-    // Side cards: rotated on Y-axis, scaled down, pushed back, dimmed
-    const rotateY = diff * 42;            // degrees of rotation
-    const translateX = diff * 30;         // % horizontal spread
-    const translateZ = -absDiff * 180;    // push side cards back
+    const rotateY = diff * 42;
+    const translateX = diff * 30;
+    const translateZ = -absDiff * 180;
     const scale = absDiff === 0 ? 1 : 0.78;
     const opacity = absDiff > 2 ? 0 : absDiff > 1 ? 0.25 : absDiff === 1 ? 0.6 : 1;
     const brightness = absDiff === 0 ? 1 : 0.35;
@@ -91,7 +104,6 @@ function App() {
     if (isAnimating || index === currentIndex || index < 0 || index >= projects.length) return;
     setIsAnimating(true);
 
-    // Animate all cards to their new positions
     cardsRef.current.forEach((card, i) => {
       if (!card) return;
       const style = getCardStyle(i, index);
@@ -125,13 +137,148 @@ function App() {
     cardsRef.current.forEach((card, i) => {
       if (!card) return;
       const style = getCardStyle(i, 0);
-      // Start from below and faded
       gsap.fromTo(card,
         { y: 80, ...style, opacity: 0 },
         { ...style, y: 0, duration: 1.2, delay: 0.3 + i * 0.08, ease: 'power2.out' }
       );
     });
   }, [getCardStyle]);
+
+  /* ─── ScrollTrigger animations ─── */
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      // Stats: count up + fade in
+      if (statsRef.current) {
+        const statEls = statsRef.current.querySelectorAll('.stat-item');
+        gsap.fromTo(statEls, {
+          y: 40, opacity: 0,
+        }, {
+          y: 0, opacity: 1,
+          duration: 0.8,
+          stagger: 0.15,
+          ease: 'power2.out',
+          scrollTrigger: {
+            trigger: statsRef.current,
+            start: 'top 80%',
+          },
+        });
+
+        // Counter animation
+        const counters = statsRef.current.querySelectorAll('.stat-number');
+        counters.forEach((el) => {
+          const target = parseInt(el.getAttribute('data-target') || '0', 10);
+          const obj = { val: 0 };
+          gsap.to(obj, {
+            val: target,
+            duration: 2,
+            ease: 'power2.out',
+            scrollTrigger: {
+              trigger: statsRef.current,
+              start: 'top 80%',
+            },
+            onUpdate: () => {
+              const suffix = el.getAttribute('data-suffix') || '';
+              el.textContent = Math.round(obj.val) + suffix;
+            },
+          });
+        });
+      }
+
+      // Selected Works: stagger reveal
+      if (worksRef.current) {
+        const heading = worksRef.current.querySelector('.works-heading');
+        if (heading) {
+          gsap.fromTo(heading, { y: 60, opacity: 0 }, {
+            y: 0, opacity: 1, duration: 1, ease: 'power2.out',
+            scrollTrigger: { trigger: heading, start: 'top 85%' },
+          });
+        }
+
+        const cards = worksRef.current.querySelectorAll('.work-card');
+        gsap.fromTo(cards, {
+          y: 80, opacity: 0, scale: 0.95,
+        }, {
+          y: 0, opacity: 1, scale: 1,
+          duration: 0.9,
+          stagger: 0.2,
+          ease: 'power2.out',
+          scrollTrigger: {
+            trigger: worksRef.current.querySelector('.works-grid'),
+            start: 'top 80%',
+          },
+        });
+      }
+
+      // About: slide in from sides
+      if (aboutRef.current) {
+        const left = aboutRef.current.querySelector('.about-left');
+        const right = aboutRef.current.querySelector('.about-right');
+        if (left) {
+          gsap.fromTo(left, { x: -80, opacity: 0 }, {
+            x: 0, opacity: 1, duration: 1, ease: 'power2.out',
+            scrollTrigger: { trigger: aboutRef.current, start: 'top 75%' },
+          });
+        }
+        if (right) {
+          gsap.fromTo(right, { x: 80, opacity: 0 }, {
+            x: 0, opacity: 1, duration: 1, delay: 0.2, ease: 'power2.out',
+            scrollTrigger: { trigger: aboutRef.current, start: 'top 75%' },
+          });
+        }
+      }
+
+      // Services: stagger from bottom
+      if (servicesRef.current) {
+        const heading = servicesRef.current.querySelector('.services-heading');
+        if (heading) {
+          gsap.fromTo(heading, { y: 40, opacity: 0 }, {
+            y: 0, opacity: 1, duration: 0.8, ease: 'power2.out',
+            scrollTrigger: { trigger: heading, start: 'top 85%' },
+          });
+        }
+        const cards = servicesRef.current.querySelectorAll('.service-card');
+        gsap.fromTo(cards, {
+          y: 60, opacity: 0,
+        }, {
+          y: 0, opacity: 1,
+          duration: 0.7,
+          stagger: 0.12,
+          ease: 'power2.out',
+          scrollTrigger: {
+            trigger: servicesRef.current.querySelector('.services-grid'),
+            start: 'top 80%',
+          },
+        });
+      }
+
+      // CTA: scale + fade
+      if (ctaRef.current) {
+        const h2 = ctaRef.current.querySelector('h2');
+        const p = ctaRef.current.querySelector('p');
+        const btn = ctaRef.current.querySelector('.cta-btn');
+        if (h2) {
+          gsap.fromTo(h2, { y: 50, opacity: 0, scale: 0.95 }, {
+            y: 0, opacity: 1, scale: 1, duration: 1, ease: 'power2.out',
+            scrollTrigger: { trigger: ctaRef.current, start: 'top 75%' },
+          });
+        }
+        if (p) {
+          gsap.fromTo(p, { y: 30, opacity: 0 }, {
+            y: 0, opacity: 1, duration: 0.8, delay: 0.2, ease: 'power2.out',
+            scrollTrigger: { trigger: ctaRef.current, start: 'top 75%' },
+          });
+        }
+        if (btn) {
+          gsap.fromTo(btn, { y: 20, opacity: 0 }, {
+            y: 0, opacity: 1, duration: 0.7, delay: 0.4, ease: 'power2.out',
+            scrollTrigger: { trigger: ctaRef.current, start: 'top 75%' },
+          });
+        }
+      }
+    });
+
+    return () => ctx.revert();
+  }, []);
 
   return (
     <div className="min-h-screen bg-black text-white">
@@ -160,14 +307,11 @@ function App() {
         </div>
       )}
 
-      {/* ═══════════════════════════════════════════════════════
-          HERO — 3D Card-Pick Carousel
-          Large heading on top, 3D fanned cards below
-      ═══════════════════════════════════════════════════════ */}
+      {/* ═══ HERO — 3D Card-Pick Carousel ═══ */}
       <section ref={heroRef} onMouseMove={handleMouseMove}
         className="relative w-full h-screen flex flex-col items-center overflow-hidden">
 
-        {/* ── Atmospheric background gradient ── */}
+        {/* Atmospheric background gradient */}
         <div className="absolute inset-0 pointer-events-none"
           style={{
             background: `
@@ -178,7 +322,7 @@ function App() {
           }}
         />
 
-        {/* ── Heading ── */}
+        {/* Heading */}
         <div className="relative z-10 flex flex-col items-center text-center pt-24 md:pt-28 px-6">
           <h1 className="fade-up overflow-visible leading-[0.95]">
             <span className="block text-[14vw] md:text-[9vw] lg:text-[7.5vw] font-bold tracking-[-0.03em] uppercase"
@@ -196,7 +340,7 @@ function App() {
           </p>
         </div>
 
-        {/* ── 3D Card Carousel ── */}
+        {/* 3D Card Carousel */}
         <div className="carousel-scene absolute bottom-[6vh] md:bottom-[8vh] w-full flex items-center justify-center"
           style={{ height: '55vh' }}>
 
@@ -213,10 +357,9 @@ function App() {
                   width: 'min(50vw, 420px)',
                   aspectRatio: '16/9',
                   ...style,
-                  transition: 'none', // GSAP handles transitions
+                  transition: 'none',
                 }}
               >
-                {/* Image with parallax on active card */}
                 <img
                   src={project.image}
                   alt={project.title}
@@ -230,7 +373,6 @@ function App() {
                   }}
                 />
 
-                {/* Bottom gradient overlay */}
                 <div className="absolute inset-0 rounded-lg"
                   style={{
                     background: `linear-gradient(to top,
@@ -242,7 +384,6 @@ function App() {
                   }}
                 />
 
-                {/* Card content */}
                 <div className="absolute bottom-0 left-0 right-0 p-6 md:p-8">
                   <span className="text-sm font-light italic text-white/60"
                     style={{ fontFamily: "'Playfair Display', Georgia, serif" }}>
@@ -254,7 +395,6 @@ function App() {
                   </h2>
                 </div>
 
-                {/* Subtle border glow */}
                 <div className="absolute inset-0 rounded-lg pointer-events-none"
                   style={{
                     boxShadow: index === currentIndex
@@ -267,7 +407,7 @@ function App() {
           })}
         </div>
 
-        {/* ── Nav Arrows (edge-mounted like reference) ── */}
+        {/* Nav Arrows */}
         <button onClick={prev} disabled={currentIndex === 0 || isAnimating}
           className="nav-arrow absolute left-3 md:left-6 top-1/2 -translate-y-1/2 z-30
                      w-12 h-12 rounded-full bg-black/30 border border-white/10
@@ -281,7 +421,7 @@ function App() {
           <ChevronRight size={22} />
         </button>
 
-        {/* ── Progress indicator ── */}
+        {/* Progress indicator */}
         <div className="absolute bottom-[2vh] left-1/2 -translate-x-1/2 flex items-center gap-3 z-20">
           {projects.map((_, i) => (
             <button key={i} onClick={() => goTo(i)} disabled={isAnimating}
@@ -295,15 +435,18 @@ function App() {
       </section>
 
       {/* ═══ STATS ═══ */}
-      <section className="py-16 border-y border-white/[0.06] bg-[#050505]">
+      <section ref={statsRef} className="py-16 border-y border-white/[0.06] bg-[#050505]">
         <div className="max-w-5xl mx-auto px-8 flex flex-col md:flex-row items-center justify-center gap-16 text-center">
           {[
-            { num: '48+', label: 'Projects Delivered' },
-            { num: '12', label: 'Awards Won' },
-            { num: '7+', label: 'Years Experience' },
+            { num: 48, suffix: '+', label: 'Projects Delivered' },
+            { num: 12, suffix: '', label: 'Awards Won' },
+            { num: 7, suffix: '+', label: 'Years Experience' },
           ].map((s, i) => (
-            <div key={i}>
-              <div className="text-4xl font-light tracking-tight text-white/85">{s.num}</div>
+            <div key={i} className="stat-item">
+              <div className="stat-number text-4xl font-light tracking-tight text-white/85"
+                data-target={s.num} data-suffix={s.suffix}>
+                0
+              </div>
               <div className="mt-2 text-[11px] tracking-[0.16em] uppercase text-white/30">{s.label}</div>
             </div>
           ))}
@@ -316,16 +459,16 @@ function App() {
           {[0, 1].map(i => (
             <div key={i} className="animate-marquee inline-block text-3xl md:text-4xl font-light tracking-tight uppercase text-white/8 px-4"
               aria-hidden={i > 0}>
-              Design • Development • Strategy • Branding • E-commerce • Architecture •&nbsp;
+              Design &bull; Development &bull; Strategy &bull; Branding &bull; E-commerce &bull; Architecture &bull;&nbsp;
             </div>
           ))}
         </div>
       </div>
 
       {/* ═══ SELECTED WORKS GRID ═══ */}
-      <section id="work" className="py-28 md:py-36 px-8 md:px-14">
+      <section ref={worksRef} id="work" className="py-28 md:py-36 px-8 md:px-14">
         <div className="max-w-6xl mx-auto">
-          <div className="mb-20 md:flex md:justify-between md:items-end">
+          <div className="works-heading mb-20 md:flex md:justify-between md:items-end">
             <div>
               <span className="text-[11px] tracking-[0.2em] uppercase text-white/30">Portfolio</span>
               <h2 className="mt-4 text-4xl md:text-5xl font-light tracking-[-0.03em] text-white/85" style={{ fontFamily: "'Playfair Display', Georgia, serif" }}>Selected Works</h2>
@@ -334,9 +477,9 @@ function App() {
               A curated collection of recent projects spanning hospitality, education, technology, and beyond.
             </p>
           </div>
-          <div className="grid md:grid-cols-2 gap-6">
+          <div className="works-grid grid md:grid-cols-2 gap-6">
             {projects.slice(0, 4).map((project) => (
-              <div key={project.id} className="group cursor-pointer img-wrap">
+              <div key={project.id} className="work-card group cursor-pointer img-wrap">
                 <div className="aspect-[16/9] overflow-hidden bg-[#0a0a0a] rounded-lg">
                   <img src={project.image} alt={project.title}
                     className="w-full h-full object-cover opacity-70 group-hover:opacity-100 img-scale" />
@@ -351,44 +494,83 @@ function App() {
         </div>
       </section>
 
-      {/* ═══ ABOUT ═══ */}
-      <section id="about" className="py-28 md:py-36 px-8 md:px-14 border-t border-white/[0.06]">
-        <div className="max-w-6xl mx-auto grid lg:grid-cols-2 gap-20">
-          <div>
+      {/* ═══ ABOUT — with vertical flowing text ═══ */}
+      <section ref={aboutRef} id="about" className="relative py-28 md:py-36 px-8 md:px-14 border-t border-white/[0.06] overflow-hidden">
+
+        {/* Vertical flowing words — decorative background */}
+        <div className="absolute right-0 top-0 bottom-0 w-[300px] md:w-[400px] overflow-hidden pointer-events-none select-none"
+          style={{ maskImage: 'linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%)' }}>
+          <div className="vertical-flow-track">
+            {[...flowingWords, ...flowingWords].map((word, i) => (
+              <div key={i} className="py-4 md:py-5 text-right pr-8 md:pr-14">
+                <span className="text-3xl md:text-5xl font-light tracking-[-0.02em] text-white/[0.04]"
+                  style={{ fontFamily: "'Playfair Display', Georgia, serif" }}>
+                  {word}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="relative z-10 max-w-6xl mx-auto grid lg:grid-cols-2 gap-20">
+          <div className="about-left">
             <span className="text-[11px] tracking-[0.2em] uppercase text-white/30">Studio</span>
             <h2 className="mt-4 text-4xl md:text-5xl font-light tracking-[-0.03em] text-white/85 leading-tight" style={{ fontFamily: "'Playfair Display', Georgia, serif" }}>
               Design that<br />moves people
             </h2>
+
+            {/* Inline flowing words preview */}
+            <div className="mt-10 h-[180px] overflow-hidden relative"
+              style={{ maskImage: 'linear-gradient(to bottom, transparent 0%, black 20%, black 80%, transparent 100%)' }}>
+              <div className="vertical-flow-inline">
+                {[...flowingWords, ...flowingWords].map((word, i) => (
+                  <div key={i} className="py-2">
+                    <span className="text-lg md:text-xl tracking-[0.15em] uppercase text-white/15 font-light">
+                      {word}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
-          <div className="space-y-6">
+          <div className="about-right space-y-6 flex flex-col justify-center">
             <p className="text-lg text-white/35 leading-relaxed">
               Crafting premium digital experiences where every element serves a purpose and every interaction feels intentional.
             </p>
             <p className="text-base text-white/25 leading-relaxed">
               From concept to launch, we partner with forward-thinking brands to create websites that are as functional as they are beautiful.
             </p>
+            <div className="pt-4 flex gap-8">
+              {['Concept', 'Design', 'Develop', 'Launch'].map((step, i) => (
+                <div key={step} className="about-step">
+                  <div className="text-[10px] text-white/15 mb-2">{String(i + 1).padStart(2, '0')}</div>
+                  <div className="text-sm font-medium text-white/40 tracking-tight">{step}</div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </section>
 
       {/* ═══ SERVICES ═══ */}
-      <section id="services" className="py-28 md:py-36 px-8 md:px-14 border-t border-white/[0.06]">
+      <section ref={servicesRef} id="services" className="py-28 md:py-36 px-8 md:px-14 border-t border-white/[0.06]">
         <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-20">
+          <div className="services-heading text-center mb-20">
             <span className="text-[11px] tracking-[0.2em] uppercase text-white/30">Services</span>
             <h2 className="mt-4 text-4xl md:text-5xl font-light tracking-[-0.03em] text-white/85" style={{ fontFamily: "'Playfair Display', Georgia, serif" }}>What we do</h2>
           </div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-px bg-white/[0.04]">
+          <div className="services-grid grid md:grid-cols-2 lg:grid-cols-4 gap-px bg-white/[0.04]">
             {[
               { title: 'Web Design', desc: 'Pixel-perfect interfaces crafted for conversion and delight.' },
               { title: 'Development', desc: 'Clean, performant code that brings designs to life.' },
               { title: 'Brand Identity', desc: 'Visual systems that communicate with clarity.' },
               { title: 'Motion Design', desc: 'Subtle animations that elevate the experience.' },
             ].map((s, i) => (
-              <div key={i} className="bg-black p-10 hover:bg-white/[0.02] transition-colors duration-500">
-                <div className="text-xs text-white/15 mb-8">{String(i + 1).padStart(2, '0')}</div>
+              <div key={i} className="service-card bg-black p-10 hover:bg-white/[0.02] transition-colors duration-500 group">
+                <div className="text-xs text-white/15 mb-8 group-hover:text-white/30 transition-colors">{String(i + 1).padStart(2, '0')}</div>
                 <h3 className="text-lg font-medium text-white/75 tracking-tight">{s.title}</h3>
                 <p className="mt-4 text-sm text-white/25 leading-relaxed">{s.desc}</p>
+                <div className="mt-6 w-0 h-px bg-white/20 group-hover:w-full transition-all duration-700" />
               </div>
             ))}
           </div>
@@ -396,7 +578,7 @@ function App() {
       </section>
 
       {/* ═══ CTA ═══ */}
-      <section id="contact" className="py-32 lg:py-44 px-6 border-t border-white/[0.06] text-center">
+      <section ref={ctaRef} id="contact" className="py-32 lg:py-44 px-6 border-t border-white/[0.06] text-center overflow-hidden">
         <div className="max-w-3xl mx-auto space-y-8">
           <h2 className="text-5xl md:text-7xl font-light tracking-[-0.04em] text-white/85 leading-[1.05]" style={{ fontFamily: "'Playfair Display', Georgia, serif" }}>
             Ready to stand out?
@@ -404,9 +586,9 @@ function App() {
           <p className="text-lg text-white/30 max-w-xl mx-auto leading-relaxed">
             Get started today and build a digital experience that leaves a lasting impression.
           </p>
-          <div className="pt-4">
+          <div className="pt-4 cta-btn">
             <a href="#"
-              className="inline-block px-10 py-5 bg-white text-black text-sm font-semibold tracking-[0.08em] uppercase hover:bg-white/90 transition-colors rounded-sm">
+              className="magnetic-btn inline-block px-10 py-5 bg-white text-black text-sm font-semibold tracking-[0.08em] uppercase hover:bg-white/90 transition-colors rounded-sm">
               Start Your Project
             </a>
           </div>
@@ -417,7 +599,7 @@ function App() {
       <footer className="py-14 px-8 md:px-14 border-t border-white/[0.06]">
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
           <span className="text-sm font-semibold tracking-[0.08em] text-white/50">HARRY CHAN</span>
-          <span className="text-xs tracking-wide text-white/20">© 2026 All rights reserved.</span>
+          <span className="text-xs tracking-wide text-white/20">&copy; 2026 All rights reserved.</span>
         </div>
       </footer>
     </div>
