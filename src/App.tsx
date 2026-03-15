@@ -134,7 +134,7 @@ function App() {
   }, [getCardStyle]);
 
   return (
-    <div className="min-h-screen bg-[#0c1a22] text-white">
+    <div className="min-h-screen bg-black text-white">
 
       {/* ═══ NAVBAR ═══ */}
       <nav className="fixed top-0 w-full z-50 flex items-center justify-between px-8 md:px-14 h-20">
@@ -148,11 +148,12 @@ function App() {
 
       {/* ═══ MOBILE MENU ═══ */}
       {menuOpen && (
-        <div className="fixed inset-0 z-40 bg-[#0c1a22]/98 backdrop-blur-sm flex flex-col items-center justify-center gap-10"
+        <div className="fixed inset-0 z-40 bg-black/98 backdrop-blur-sm flex flex-col items-center justify-center gap-10"
           style={{ animation: 'fadeUp 0.3s ease-out forwards' }}>
           {['Work', 'Services', 'About', 'Contact'].map((item) => (
             <a key={item} href={`#${item.toLowerCase()}`} onClick={() => setMenuOpen(false)}
-              className="text-4xl md:text-5xl font-light tracking-tight text-white/80 hover:text-white transition-colors">
+              className="text-4xl md:text-5xl font-light tracking-tight text-white/80 hover:text-white transition-colors"
+              style={{ fontFamily: "'Playfair Display', Georgia, serif" }}>
               {item}
             </a>
           ))}
@@ -170,9 +171,9 @@ function App() {
         <div className="absolute inset-0 pointer-events-none"
           style={{
             background: `
-              radial-gradient(ellipse 80% 50% at 50% 30%, rgba(45,85,105,0.35) 0%, transparent 70%),
-              radial-gradient(ellipse 60% 40% at 50% 80%, rgba(20,50,70,0.4) 0%, transparent 60%),
-              linear-gradient(to bottom, #0c1a22 0%, #0f2230 40%, #0c1a22 100%)
+              radial-gradient(ellipse 80% 50% at 50% 30%, rgba(255,255,255,0.03) 0%, transparent 70%),
+              radial-gradient(ellipse 60% 40% at 50% 80%, rgba(255,255,255,0.02) 0%, transparent 60%),
+              linear-gradient(to bottom, #000000 0%, #0a0a0a 40%, #000000 100%)
             `
           }}
         />
@@ -181,11 +182,11 @@ function App() {
         <div className="relative z-10 flex flex-col items-center text-center pt-24 md:pt-28 px-6">
           <h1 className="fade-up overflow-visible leading-[0.95]">
             <span className="block text-[14vw] md:text-[9vw] lg:text-[7.5vw] font-bold tracking-[-0.03em] uppercase"
-              style={{ color: 'rgba(125,181,197,0.55)', letterSpacing: '-0.02em' }}>
+              style={{ color: 'rgba(255,255,255,0.85)', letterSpacing: '-0.02em' }}>
               Portfolio
             </span>
-            <span className="block text-[8vw] md:text-[4.5vw] lg:text-[3.8vw] font-light italic text-white/80 -mt-[1vw] md:-mt-[0.5vw]"
-              style={{ fontFamily: "'Georgia', serif" }}>
+            <span className="block text-[8vw] md:text-[4.5vw] lg:text-[3.8vw] font-light italic text-white/60 -mt-[1vw] md:-mt-[0.5vw]"
+              style={{ fontFamily: "'Playfair Display', Georgia, serif" }}>
               selected works
             </span>
           </h1>
@@ -209,8 +210,8 @@ function App() {
                 className="carousel-card absolute cursor-pointer rounded-lg overflow-hidden"
                 onClick={() => goTo(index)}
                 style={{
-                  width: 'min(50vw, 380px)',
-                  height: '100%',
+                  width: 'min(50vw, 420px)',
+                  aspectRatio: '16/9',
                   ...style,
                   transition: 'none', // GSAP handles transitions
                 }}
@@ -234,8 +235,8 @@ function App() {
                   style={{
                     background: `linear-gradient(to top,
                       ${project.color}44 0%,
-                      rgba(12,26,34,0.6) 35%,
-                      rgba(12,26,34,0.15) 55%,
+                      rgba(0,0,0,0.6) 35%,
+                      rgba(0,0,0,0.15) 55%,
                       transparent 100%
                     )`,
                   }}
@@ -244,7 +245,7 @@ function App() {
                 {/* Card content */}
                 <div className="absolute bottom-0 left-0 right-0 p-6 md:p-8">
                   <span className="text-sm font-light italic text-white/60"
-                    style={{ fontFamily: "'Georgia', serif" }}>
+                    style={{ fontFamily: "'Playfair Display', Georgia, serif" }}>
                     {project.category}
                   </span>
                   <h2 className="mt-1 text-xl md:text-2xl font-bold tracking-tight uppercase text-white/95 leading-tight"
@@ -294,7 +295,7 @@ function App() {
       </section>
 
       {/* ═══ STATS ═══ */}
-      <section className="py-16 border-y border-white/[0.06] bg-[#0a1820]">
+      <section className="py-16 border-y border-white/[0.06] bg-[#050505]">
         <div className="max-w-5xl mx-auto px-8 flex flex-col md:flex-row items-center justify-center gap-16 text-center">
           {[
             { num: '48+', label: 'Projects Delivered' },
@@ -327,7 +328,7 @@ function App() {
           <div className="mb-20 md:flex md:justify-between md:items-end">
             <div>
               <span className="text-[11px] tracking-[0.2em] uppercase text-white/30">Portfolio</span>
-              <h2 className="mt-4 text-4xl md:text-5xl font-light tracking-[-0.03em] text-white/85">Selected Works</h2>
+              <h2 className="mt-4 text-4xl md:text-5xl font-light tracking-[-0.03em] text-white/85" style={{ fontFamily: "'Playfair Display', Georgia, serif" }}>Selected Works</h2>
             </div>
             <p className="mt-6 md:mt-0 text-base text-white/30 max-w-sm leading-relaxed">
               A curated collection of recent projects spanning hospitality, education, technology, and beyond.
@@ -336,7 +337,7 @@ function App() {
           <div className="grid md:grid-cols-2 gap-6">
             {projects.slice(0, 4).map((project) => (
               <div key={project.id} className="group cursor-pointer img-wrap">
-                <div className="aspect-[16/10] overflow-hidden bg-[#111820] rounded-lg">
+                <div className="aspect-[16/9] overflow-hidden bg-[#0a0a0a] rounded-lg">
                   <img src={project.image} alt={project.title}
                     className="w-full h-full object-cover opacity-70 group-hover:opacity-100 img-scale" />
                 </div>
@@ -355,7 +356,7 @@ function App() {
         <div className="max-w-6xl mx-auto grid lg:grid-cols-2 gap-20">
           <div>
             <span className="text-[11px] tracking-[0.2em] uppercase text-white/30">Studio</span>
-            <h2 className="mt-4 text-4xl md:text-5xl font-light tracking-[-0.03em] text-white/85 leading-tight">
+            <h2 className="mt-4 text-4xl md:text-5xl font-light tracking-[-0.03em] text-white/85 leading-tight" style={{ fontFamily: "'Playfair Display', Georgia, serif" }}>
               Design that<br />moves people
             </h2>
           </div>
@@ -375,7 +376,7 @@ function App() {
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-20">
             <span className="text-[11px] tracking-[0.2em] uppercase text-white/30">Services</span>
-            <h2 className="mt-4 text-4xl md:text-5xl font-light tracking-[-0.03em] text-white/85">What we do</h2>
+            <h2 className="mt-4 text-4xl md:text-5xl font-light tracking-[-0.03em] text-white/85" style={{ fontFamily: "'Playfair Display', Georgia, serif" }}>What we do</h2>
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-px bg-white/[0.04]">
             {[
@@ -384,7 +385,7 @@ function App() {
               { title: 'Brand Identity', desc: 'Visual systems that communicate with clarity.' },
               { title: 'Motion Design', desc: 'Subtle animations that elevate the experience.' },
             ].map((s, i) => (
-              <div key={i} className="bg-[#0c1a22] p-10 hover:bg-white/[0.02] transition-colors duration-500">
+              <div key={i} className="bg-black p-10 hover:bg-white/[0.02] transition-colors duration-500">
                 <div className="text-xs text-white/15 mb-8">{String(i + 1).padStart(2, '0')}</div>
                 <h3 className="text-lg font-medium text-white/75 tracking-tight">{s.title}</h3>
                 <p className="mt-4 text-sm text-white/25 leading-relaxed">{s.desc}</p>
@@ -397,7 +398,7 @@ function App() {
       {/* ═══ CTA ═══ */}
       <section id="contact" className="py-32 lg:py-44 px-6 border-t border-white/[0.06] text-center">
         <div className="max-w-3xl mx-auto space-y-8">
-          <h2 className="text-5xl md:text-7xl font-light tracking-[-0.04em] text-white/85 leading-[1.05]">
+          <h2 className="text-5xl md:text-7xl font-light tracking-[-0.04em] text-white/85 leading-[1.05]" style={{ fontFamily: "'Playfair Display', Georgia, serif" }}>
             Ready to stand out?
           </h2>
           <p className="text-lg text-white/30 max-w-xl mx-auto leading-relaxed">
@@ -405,7 +406,7 @@ function App() {
           </p>
           <div className="pt-4">
             <a href="#"
-              className="inline-block px-10 py-5 bg-white text-[#0c1a22] text-sm font-semibold tracking-[0.08em] uppercase hover:bg-white/90 transition-colors rounded-sm">
+              className="inline-block px-10 py-5 bg-white text-black text-sm font-semibold tracking-[0.08em] uppercase hover:bg-white/90 transition-colors rounded-sm">
               Start Your Project
             </a>
           </div>
