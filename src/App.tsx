@@ -51,7 +51,18 @@ function App() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [menuOpen, setMenuOpen] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
+  const [mouse, setMouse] = useState({ x: 0, y: 0 });
   const cardsRef = useRef<(HTMLDivElement | null)[]>([]);
+  const heroRef = useRef<HTMLElement>(null);
+
+  /* ─── Mouse parallax tracking ─── */
+  const handleMouseMove = useCallback((e: React.MouseEvent<HTMLElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    // Normalize to -1 … +1 from center
+    const x = ((e.clientX - rect.left) / rect.width - 0.5) * 2;
+    const y = ((e.clientY - rect.top) / rect.height - 0.5) * 2;
+    setMouse({ x, y });
+  }, []);
 
   /* ─── Calculate card transforms ─── */
   const getCardStyle = useCallback((index: number, active: number) => {
@@ -152,7 +163,8 @@ function App() {
           HERO — 3D Card-Pick Carousel
           Large heading on top, 3D fanned cards below
       ═══════════════════════════════════════════════════════ */}
-      <section className="relative w-full h-screen flex flex-col items-center overflow-hidden">
+      <section ref={heroRef} onMouseMove={handleMouseMove}
+        className="relative w-full h-screen flex flex-col items-center overflow-hidden">
 
         {/* ── Atmospheric background gradient ── */}
         <div className="absolute inset-0 pointer-events-none"
@@ -203,12 +215,18 @@ function App() {
                   transition: 'none', // GSAP handles transitions
                 }}
               >
-                {/* Image */}
+                {/* Image with parallax on active card */}
                 <img
                   src={project.image}
                   alt={project.title}
                   className="w-full h-full object-cover"
                   loading={index < 3 ? 'eager' : 'lazy'}
+                  style={{
+                    transform: index === currentIndex
+                      ? `translate(${-mouse.x * 15}px, ${-mouse.y * 10}px) scale(1.08)`
+                      : 'scale(1.02)',
+                    transition: 'transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+                  }}
                 />
 
                 {/* Bottom gradient overlay */}
