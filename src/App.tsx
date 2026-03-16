@@ -1,7 +1,7 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { Menu, X } from 'lucide-react';
+import { ChevronRight, Menu, X } from 'lucide-react';
 import './App.css';
 
 gsap.registerPlugin(ScrollTrigger);
@@ -52,9 +52,9 @@ const projects = [
 
 function App() {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [isHoveringOrbit, setIsHoveringOrbit] = useState(false);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isAnimating, setIsAnimating] = useState(false);
   const cardsRef = useRef<(HTMLDivElement | null)[]>([]);
-  const orbitAngle = useRef(0);
   const heroRef = useRef<HTMLElement>(null);
   const statsRef = useRef<HTMLElement>(null);
   const worksRef = useRef<HTMLElement>(null);
@@ -62,46 +62,89 @@ function App() {
   const servicesRef = useRef<HTMLElement>(null);
   const ctaRef = useRef<HTMLElement>(null);
 
-  /* ─── Orbital carousel animation ─── */
-  useEffect(() => {
+  /* ─── Semicircle Ferris wheel: position cards along a bottom arc ─── */
+  const getArcStyle = useCallback((index: number, active: number) => {
     const N = projects.length;
-    const speed = 0.003; // radians per frame
-    const radiusX = 340; // horizontal spread (px)
-    const verticalShift = 30; // cards at back shift up slightly
+    const diff = ((index - active % N) + N) % N; // wrap around: 0,1,2,3,4
+    // Map each card to an angle along the bottom semicircle
+    // 0 = center bottom (active), spread evenly to the sides
+    // Angle: -90° (left) to +90° (right), center = 0°
+    const step = Math.PI / (N - 1); // spread across 180°
+    const angle = -Math.PI / 2 + diff * step;
 
-    let rafId: number;
+    const radiusX = 380; // horizontal spread
+    const radiusY = 180; // arc height
 
-    const animate = () => {
-      if (!isHoveringOrbit) {
-        orbitAngle.current += speed;
-      }
+    const x = Math.sin(angle) * radiusX;
+    const y = -(Math.cos(angle) * radiusY); // negative because bottom of arc goes up
 
-      cardsRef.current.forEach((card, i) => {
-        if (!card) return;
+    // Active card (diff=0) is largest; cards further away shrink
+    const distFromCenter = Math.min(diff, N - diff);
+    const scale = distFromCenter === 0 ? 1.05 : Math.max(0.55, 1 - distFromCenter * 0.15);
+    const opacity = distFromCenter === 0 ? 1 : Math.max(0.25, 1 - distFromCenter * 0.25);
+    const brightness = distFromCenter === 0 ? 1 : Math.max(0.3, 1 - distFromCenter * 0.2);
+    const zIndex = 10 - distFromCenter;
 
-        const angle = orbitAngle.current + (Math.PI * 2 / N) * i;
-        const x = Math.sin(angle) * radiusX;
-        const z = Math.cos(angle); // -1 (back) to +1 (front)
-        const y = -z * verticalShift; // back cards move up
+    return { x, y, scale, opacity, brightness, zIndex };
+  }, []);
 
-        // Map z from [-1, 1] to visual properties
-        const scale = 0.55 + (z + 1) * 0.275; // 0.55 → 1.1
-        const opacity = 0.2 + (z + 1) * 0.4;  // 0.2 → 1.0
-        const brightness = 0.3 + (z + 1) * 0.35; // 0.3 → 1.0
-        const zIndex = Math.round((z + 1) * 10);
+  /* ─── Animate to next/prev ─── */
+  const goTo = useCallback((index: number) => {
+    if (isAnimating) return;
+    const N = projects.length;
+    const target = ((index % N) + N) % N; // wrap around
+    if (target === currentIndex) return;
+    setIsAnimating(true);
 
-        card.style.transform = `translateX(${x}px) translateY(${y}px) scale(${scale})`;
-        card.style.opacity = String(opacity);
-        card.style.filter = `brightness(${brightness})`;
-        card.style.zIndex = String(zIndex);
+    cardsRef.current.forEach((card, i) => {
+      if (!card) return;
+      const s = getArcStyle(i, target);
+      gsap.to(card, {
+        x: s.x, y: s.y, scale: s.scale, opacity: s.opacity,
+        filter: `brightness(${s.brightness})`,
+        zIndex: s.zIndex,
+        duration: 0.8,
+        ease: 'power3.inOut',
+        onComplete: i === 0 ? () => {
+          setCurrentIndex(target);
+          setIsAnimating(false);
+        } : undefined,
       });
+    });
+  }, [currentIndex, isAnimating, getArcStyle]);
 
-      rafId = requestAnimationFrame(animate);
+  const next = useCallback(() => goTo(currentIndex + 1), [currentIndex, goTo]);
+  const prev = useCallback(() => goTo(currentIndex - 1), [currentIndex, goTo]);
+
+  /* ─── Set initial positions ─── */
+  useEffect(() => {
+    cardsRef.current.forEach((card, i) => {
+      if (!card) return;
+      const s = getArcStyle(i, 0);
+      gsap.set(card, {
+        x: s.x, y: s.y, scale: s.scale, opacity: 0,
+        filter: `brightness(${s.brightness})`,
+        zIndex: s.zIndex,
+      });
+      // Entrance animation
+      gsap.to(card, {
+        opacity: s.opacity,
+        duration: 1,
+        delay: 0.3 + i * 0.1,
+        ease: 'power2.out',
+      });
+    });
+  }, [getArcStyle]);
+
+  /* ─── Keyboard nav ─── */
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowRight') next();
+      if (e.key === 'ArrowLeft') prev();
     };
-
-    rafId = requestAnimationFrame(animate);
-    return () => cancelAnimationFrame(rafId);
-  }, [isHoveringOrbit]);
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [next, prev]);
 
   /* ─── ScrollTrigger animations ─── */
   useEffect(() => {
@@ -220,7 +263,7 @@ function App() {
         </div>
       )}
 
-      {/* ═══ HERO — Orbital Carousel ═══ */}
+      {/* ═══ HERO — Semicircle Ferris Wheel ═══ */}
       <section ref={heroRef}
         className="relative w-full h-screen flex flex-col items-center overflow-hidden">
 
@@ -252,20 +295,19 @@ function App() {
           </p>
         </div>
 
-        {/* Orbital Carousel */}
-        <div className="orbit-stage absolute bottom-[10vh] md:bottom-[12vh] w-full flex items-center justify-center"
-          style={{ height: '50vh' }}
-          onMouseEnter={() => setIsHoveringOrbit(true)}
-          onMouseLeave={() => setIsHoveringOrbit(false)}>
+        {/* Semicircle Ferris Wheel */}
+        <div className="absolute bottom-[8vh] md:bottom-[10vh] w-full flex items-center justify-center"
+          style={{ height: '55vh' }}>
 
-          {/* Orbit track hint — subtle ellipse */}
-          <div className="absolute w-[680px] h-[200px] border border-white/[0.03] rounded-[50%] pointer-events-none" />
+          {/* Subtle arc track hint */}
+          <div className="absolute bottom-0 w-[760px] h-[360px] border-t border-l border-r border-white/[0.03] rounded-t-[50%] pointer-events-none" />
 
           {projects.map((project, index) => (
             <div
               key={project.id}
               ref={el => { cardsRef.current[index] = el; }}
-              className="orbit-card absolute cursor-pointer rounded-lg overflow-hidden"
+              className="ferris-card absolute cursor-pointer rounded-lg overflow-hidden"
+              onClick={() => goTo(index)}
               style={{
                 width: 'min(45vw, 340px)',
                 aspectRatio: '16/9',
@@ -310,11 +352,25 @@ function App() {
           ))}
         </div>
 
-        {/* Orbit status */}
-        <div className="absolute bottom-[3vh] left-1/2 -translate-x-1/2 z-20">
-          <span className="text-[10px] tracking-[0.2em] uppercase text-white/20">
-            {isHoveringOrbit ? 'Paused' : 'Orbiting'}
-          </span>
+        {/* Next button */}
+        <button onClick={next} disabled={isAnimating}
+          className="nav-arrow absolute right-6 md:right-12 bottom-[12vh] z-30
+                     w-14 h-14 rounded-full bg-white/5 border border-white/10
+                     flex items-center justify-center text-white/60 hover:text-white hover:bg-white/10
+                     backdrop-blur-sm transition-all">
+          <ChevronRight size={24} />
+        </button>
+
+        {/* Current project indicator */}
+        <div className="absolute bottom-[3vh] left-1/2 -translate-x-1/2 flex items-center gap-3 z-20">
+          {projects.map((_, i) => (
+            <button key={i} onClick={() => goTo(i)} disabled={isAnimating}
+              className={`rounded-full transition-all duration-500
+                ${i === currentIndex
+                  ? 'w-3 h-3 bg-white/70'
+                  : 'w-2 h-2 bg-white/20 hover:bg-white/30'}`}
+            />
+          ))}
         </div>
       </section>
 
