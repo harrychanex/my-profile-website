@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { ChevronLeft, ChevronRight, Menu, X } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
 import './App.css';
 
 gsap.registerPlugin(ScrollTrigger);
@@ -51,11 +51,10 @@ const projects = [
 ];
 
 function App() {
-  const [currentIndex, setCurrentIndex] = useState(0);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [isAnimating, setIsAnimating] = useState(false);
-  const [mouse, setMouse] = useState({ x: 0, y: 0 });
+  const [isHoveringOrbit, setIsHoveringOrbit] = useState(false);
   const cardsRef = useRef<(HTMLDivElement | null)[]>([]);
+  const orbitAngle = useRef(0);
   const heroRef = useRef<HTMLElement>(null);
   const statsRef = useRef<HTMLElement>(null);
   const worksRef = useRef<HTMLElement>(null);
@@ -63,120 +62,73 @@ function App() {
   const servicesRef = useRef<HTMLElement>(null);
   const ctaRef = useRef<HTMLElement>(null);
 
-  /* ─── Mouse parallax tracking ─── */
-  const handleMouseMove = useCallback((e: React.MouseEvent<HTMLElement>) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    const x = ((e.clientX - rect.left) / rect.width - 0.5) * 2;
-    const y = ((e.clientY - rect.top) / rect.height - 0.5) * 2;
-    setMouse({ x, y });
-  }, []);
+  /* ─── Orbital carousel animation ─── */
+  useEffect(() => {
+    const N = projects.length;
+    const speed = 0.003; // radians per frame
+    const radiusX = 340; // horizontal spread (px)
+    const radiusZ = 220; // depth spread (conceptual)
+    const verticalShift = 30; // cards at back shift up slightly
 
-  /* ─── Calculate card transforms ─── */
-  const getCardStyle = useCallback((index: number, active: number) => {
-    const diff = index - active;
-    const absDiff = Math.abs(diff);
+    let rafId: number;
 
-    const rotateY = diff * 42;
-    const translateX = diff * 30;
-    const translateZ = -absDiff * 180;
-    const scale = absDiff === 0 ? 1 : 0.78;
-    const opacity = absDiff > 2 ? 0 : absDiff > 1 ? 0.25 : absDiff === 1 ? 0.6 : 1;
-    const brightness = absDiff === 0 ? 1 : 0.35;
+    const animate = () => {
+      if (!isHoveringOrbit) {
+        orbitAngle.current += speed;
+      }
 
-    return {
-      transform: `translateX(${translateX}%) rotateY(${rotateY}deg) translateZ(${translateZ}px) scale(${scale})`,
-      opacity,
-      filter: `brightness(${brightness})`,
-      zIndex: 10 - absDiff,
-    };
-  }, []);
+      cardsRef.current.forEach((card, i) => {
+        if (!card) return;
 
-  /* ─── Animate to index ─── */
-  const goTo = useCallback((index: number) => {
-    if (isAnimating || index === currentIndex || index < 0 || index >= projects.length) return;
-    setIsAnimating(true);
+        const angle = orbitAngle.current + (Math.PI * 2 / N) * i;
+        const x = Math.sin(angle) * radiusX;
+        const z = Math.cos(angle); // -1 (back) to +1 (front)
+        const y = -z * verticalShift; // back cards move up
 
-    cardsRef.current.forEach((card, i) => {
-      if (!card) return;
-      const style = getCardStyle(i, index);
-      gsap.to(card, {
-        duration: 0.9,
-        ease: 'power3.inOut',
-        ...style,
-        onComplete: i === index ? () => {
-          setCurrentIndex(index);
-          setIsAnimating(false);
-        } : undefined,
+        // Map z from [-1, 1] to visual properties
+        const scale = 0.55 + (z + 1) * 0.275; // 0.55 → 1.1
+        const opacity = 0.2 + (z + 1) * 0.4;  // 0.2 → 1.0
+        const brightness = 0.3 + (z + 1) * 0.35; // 0.3 → 1.0
+        const zIndex = Math.round((z + 1) * 10);
+
+        card.style.transform = `translateX(${x}px) translateY(${y}px) scale(${scale})`;
+        card.style.opacity = String(opacity);
+        card.style.filter = `brightness(${brightness})`;
+        card.style.zIndex = String(zIndex);
       });
-    });
-  }, [currentIndex, isAnimating, getCardStyle]);
 
-  const next = useCallback(() => goTo(currentIndex + 1), [currentIndex, goTo]);
-  const prev = useCallback(() => goTo(currentIndex - 1), [currentIndex, goTo]);
-
-  /* ─── Keyboard ─── */
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'ArrowRight') next();
-      if (e.key === 'ArrowLeft') prev();
+      rafId = requestAnimationFrame(animate);
     };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [next, prev]);
 
-  /* ─── Initial entrance animation ─── */
-  useEffect(() => {
-    cardsRef.current.forEach((card, i) => {
-      if (!card) return;
-      const style = getCardStyle(i, 0);
-      gsap.fromTo(card,
-        { y: 80, ...style, opacity: 0 },
-        { ...style, y: 0, duration: 1.2, delay: 0.3 + i * 0.08, ease: 'power2.out' }
-      );
-    });
-  }, [getCardStyle]);
+    rafId = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(rafId);
+  }, [isHoveringOrbit]);
 
   /* ─── ScrollTrigger animations ─── */
   useEffect(() => {
     const ctx = gsap.context(() => {
-      // Stats: count up + fade in
+      // Stats
       if (statsRef.current) {
         const statEls = statsRef.current.querySelectorAll('.stat-item');
-        gsap.fromTo(statEls, {
-          y: 40, opacity: 0,
-        }, {
-          y: 0, opacity: 1,
-          duration: 0.8,
-          stagger: 0.15,
-          ease: 'power2.out',
-          scrollTrigger: {
-            trigger: statsRef.current,
-            start: 'top 80%',
-          },
+        gsap.fromTo(statEls, { y: 40, opacity: 0 }, {
+          y: 0, opacity: 1, duration: 0.8, stagger: 0.15, ease: 'power2.out',
+          scrollTrigger: { trigger: statsRef.current, start: 'top 80%' },
         });
-
-        // Counter animation
         const counters = statsRef.current.querySelectorAll('.stat-number');
         counters.forEach((el) => {
           const target = parseInt(el.getAttribute('data-target') || '0', 10);
           const obj = { val: 0 };
           gsap.to(obj, {
-            val: target,
-            duration: 2,
-            ease: 'power2.out',
-            scrollTrigger: {
-              trigger: statsRef.current,
-              start: 'top 80%',
-            },
+            val: target, duration: 2, ease: 'power2.out',
+            scrollTrigger: { trigger: statsRef.current, start: 'top 80%' },
             onUpdate: () => {
-              const suffix = el.getAttribute('data-suffix') || '';
-              el.textContent = Math.round(obj.val) + suffix;
+              el.textContent = Math.round(obj.val) + (el.getAttribute('data-suffix') || '');
             },
           });
         });
       }
 
-      // Selected Works: stagger reveal
+      // Selected Works
       if (worksRef.current) {
         const heading = worksRef.current.querySelector('.works-heading');
         if (heading) {
@@ -185,90 +137,60 @@ function App() {
             scrollTrigger: { trigger: heading, start: 'top 85%' },
           });
         }
-
         const cards = worksRef.current.querySelectorAll('.work-card');
-        gsap.fromTo(cards, {
-          y: 80, opacity: 0, scale: 0.95,
-        }, {
-          y: 0, opacity: 1, scale: 1,
-          duration: 0.9,
-          stagger: 0.2,
-          ease: 'power2.out',
-          scrollTrigger: {
-            trigger: worksRef.current.querySelector('.works-grid'),
-            start: 'top 80%',
-          },
+        gsap.fromTo(cards, { y: 80, opacity: 0, scale: 0.95 }, {
+          y: 0, opacity: 1, scale: 1, duration: 0.9, stagger: 0.2, ease: 'power2.out',
+          scrollTrigger: { trigger: worksRef.current.querySelector('.works-grid'), start: 'top 80%' },
         });
       }
 
-      // About: slide in from sides
+      // About
       if (aboutRef.current) {
         const left = aboutRef.current.querySelector('.about-left');
         const right = aboutRef.current.querySelector('.about-right');
-        if (left) {
-          gsap.fromTo(left, { x: -80, opacity: 0 }, {
-            x: 0, opacity: 1, duration: 1, ease: 'power2.out',
-            scrollTrigger: { trigger: aboutRef.current, start: 'top 75%' },
-          });
-        }
-        if (right) {
-          gsap.fromTo(right, { x: 80, opacity: 0 }, {
-            x: 0, opacity: 1, duration: 1, delay: 0.2, ease: 'power2.out',
-            scrollTrigger: { trigger: aboutRef.current, start: 'top 75%' },
-          });
-        }
-      }
-
-      // Services: stagger from bottom
-      if (servicesRef.current) {
-        const heading = servicesRef.current.querySelector('.services-heading');
-        if (heading) {
-          gsap.fromTo(heading, { y: 40, opacity: 0 }, {
-            y: 0, opacity: 1, duration: 0.8, ease: 'power2.out',
-            scrollTrigger: { trigger: heading, start: 'top 85%' },
-          });
-        }
-        const cards = servicesRef.current.querySelectorAll('.service-card');
-        gsap.fromTo(cards, {
-          y: 60, opacity: 0,
-        }, {
-          y: 0, opacity: 1,
-          duration: 0.7,
-          stagger: 0.12,
-          ease: 'power2.out',
-          scrollTrigger: {
-            trigger: servicesRef.current.querySelector('.services-grid'),
-            start: 'top 80%',
-          },
+        if (left) gsap.fromTo(left, { x: -80, opacity: 0 }, {
+          x: 0, opacity: 1, duration: 1, ease: 'power2.out',
+          scrollTrigger: { trigger: aboutRef.current, start: 'top 75%' },
+        });
+        if (right) gsap.fromTo(right, { x: 80, opacity: 0 }, {
+          x: 0, opacity: 1, duration: 1, delay: 0.2, ease: 'power2.out',
+          scrollTrigger: { trigger: aboutRef.current, start: 'top 75%' },
         });
       }
 
-      // CTA: scale + fade
+      // Services
+      if (servicesRef.current) {
+        const heading = servicesRef.current.querySelector('.services-heading');
+        if (heading) gsap.fromTo(heading, { y: 40, opacity: 0 }, {
+          y: 0, opacity: 1, duration: 0.8, ease: 'power2.out',
+          scrollTrigger: { trigger: heading, start: 'top 85%' },
+        });
+        const cards = servicesRef.current.querySelectorAll('.service-card');
+        gsap.fromTo(cards, { y: 60, opacity: 0 }, {
+          y: 0, opacity: 1, duration: 0.7, stagger: 0.12, ease: 'power2.out',
+          scrollTrigger: { trigger: servicesRef.current.querySelector('.services-grid'), start: 'top 80%' },
+        });
+      }
+
+      // CTA
       if (ctaRef.current) {
         const h2 = ctaRef.current.querySelector('h2');
         const p = ctaRef.current.querySelector('p');
         const btn = ctaRef.current.querySelector('.cta-btn');
-        if (h2) {
-          gsap.fromTo(h2, { y: 50, opacity: 0, scale: 0.95 }, {
-            y: 0, opacity: 1, scale: 1, duration: 1, ease: 'power2.out',
-            scrollTrigger: { trigger: ctaRef.current, start: 'top 75%' },
-          });
-        }
-        if (p) {
-          gsap.fromTo(p, { y: 30, opacity: 0 }, {
-            y: 0, opacity: 1, duration: 0.8, delay: 0.2, ease: 'power2.out',
-            scrollTrigger: { trigger: ctaRef.current, start: 'top 75%' },
-          });
-        }
-        if (btn) {
-          gsap.fromTo(btn, { y: 20, opacity: 0 }, {
-            y: 0, opacity: 1, duration: 0.7, delay: 0.4, ease: 'power2.out',
-            scrollTrigger: { trigger: ctaRef.current, start: 'top 75%' },
-          });
-        }
+        if (h2) gsap.fromTo(h2, { y: 50, opacity: 0, scale: 0.95 }, {
+          y: 0, opacity: 1, scale: 1, duration: 1, ease: 'power2.out',
+          scrollTrigger: { trigger: ctaRef.current, start: 'top 75%' },
+        });
+        if (p) gsap.fromTo(p, { y: 30, opacity: 0 }, {
+          y: 0, opacity: 1, duration: 0.8, delay: 0.2, ease: 'power2.out',
+          scrollTrigger: { trigger: ctaRef.current, start: 'top 75%' },
+        });
+        if (btn) gsap.fromTo(btn, { y: 20, opacity: 0 }, {
+          y: 0, opacity: 1, duration: 0.7, delay: 0.4, ease: 'power2.out',
+          scrollTrigger: { trigger: ctaRef.current, start: 'top 75%' },
+        });
       }
     });
-
     return () => ctx.revert();
   }, []);
 
@@ -299,11 +221,11 @@ function App() {
         </div>
       )}
 
-      {/* ═══ HERO — 3D Card-Pick Carousel ═══ */}
-      <section ref={heroRef} onMouseMove={handleMouseMove}
+      {/* ═══ HERO — Orbital Carousel ═══ */}
+      <section ref={heroRef}
         className="relative w-full h-screen flex flex-col items-center overflow-hidden">
 
-        {/* Atmospheric background gradient */}
+        {/* Atmospheric background */}
         <div className="absolute inset-0 pointer-events-none"
           style={{
             background: `
@@ -326,103 +248,74 @@ function App() {
               selected works
             </span>
           </h1>
-
           <p className="fade-up fade-up-d1 mt-4 text-sm md:text-base text-white/30 tracking-wide max-w-md">
             A curated collection of recent projects
           </p>
         </div>
 
-        {/* 3D Card Carousel */}
-        <div className="carousel-scene absolute bottom-[6vh] md:bottom-[8vh] w-full flex items-center justify-center"
-          style={{ height: '55vh' }}>
+        {/* Orbital Carousel */}
+        <div className="orbit-stage absolute bottom-[10vh] md:bottom-[12vh] w-full flex items-center justify-center"
+          style={{ height: '50vh' }}
+          onMouseEnter={() => setIsHoveringOrbit(true)}
+          onMouseLeave={() => setIsHoveringOrbit(false)}>
 
-          {projects.map((project, index) => {
-            const style = getCardStyle(index, currentIndex);
+          {/* Orbit track hint — subtle ellipse */}
+          <div className="absolute w-[680px] h-[200px] border border-white/[0.03] rounded-[50%] pointer-events-none" />
 
-            return (
-              <div
-                key={project.id}
-                ref={el => { cardsRef.current[index] = el; }}
-                className="carousel-card absolute cursor-pointer rounded-lg overflow-hidden"
-                onClick={() => goTo(index)}
+          {projects.map((project, index) => (
+            <div
+              key={project.id}
+              ref={el => { cardsRef.current[index] = el; }}
+              className="orbit-card absolute cursor-pointer rounded-lg overflow-hidden"
+              style={{
+                width: 'min(45vw, 340px)',
+                aspectRatio: '16/9',
+              }}
+            >
+              <img
+                src={project.image}
+                alt={project.title}
+                className="w-full h-full object-cover"
+                loading={index < 3 ? 'eager' : 'lazy'}
+              />
+
+              {/* Gradient overlay */}
+              <div className="absolute inset-0 rounded-lg"
                 style={{
-                  width: 'min(50vw, 420px)',
-                  aspectRatio: '16/9',
-                  ...style,
-                  transition: 'none',
+                  background: `linear-gradient(to top,
+                    ${project.color}55 0%,
+                    rgba(0,0,0,0.5) 40%,
+                    rgba(0,0,0,0.1) 60%,
+                    transparent 100%
+                  )`,
                 }}
-              >
-                <img
-                  src={project.image}
-                  alt={project.title}
-                  className="w-full h-full object-cover"
-                  loading={index < 3 ? 'eager' : 'lazy'}
-                  style={{
-                    transform: index === currentIndex
-                      ? `translate(${-mouse.x * 15}px, ${-mouse.y * 10}px) scale(1.08)`
-                      : 'scale(1.02)',
-                    transition: 'transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
-                  }}
-                />
+              />
 
-                <div className="absolute inset-0 rounded-lg"
-                  style={{
-                    background: `linear-gradient(to top,
-                      ${project.color}44 0%,
-                      rgba(0,0,0,0.6) 35%,
-                      rgba(0,0,0,0.15) 55%,
-                      transparent 100%
-                    )`,
-                  }}
-                />
-
-                <div className="absolute bottom-0 left-0 right-0 p-6 md:p-8">
-                  <span className="text-sm font-light italic text-white/60"
-                    style={{ fontFamily: "'Playfair Display', Georgia, serif" }}>
-                    {project.category}
-                  </span>
-                  <h2 className="mt-1 text-xl md:text-2xl font-bold tracking-tight uppercase text-white/95 leading-tight"
-                    style={{ color: project.color }}>
-                    {project.title}
-                  </h2>
-                </div>
-
-                <div className="absolute inset-0 rounded-lg pointer-events-none"
-                  style={{
-                    boxShadow: index === currentIndex
-                      ? `0 0 60px ${project.color}22, 0 20px 60px rgba(0,0,0,0.5)`
-                      : '0 10px 40px rgba(0,0,0,0.6)',
-                  }}
-                />
+              {/* Card content */}
+              <div className="absolute bottom-0 left-0 right-0 p-5 md:p-6">
+                <span className="text-xs font-light italic text-white/50"
+                  style={{ fontFamily: "'Playfair Display', Georgia, serif" }}>
+                  {project.category}
+                </span>
+                <h2 className="mt-1 text-lg md:text-xl font-bold tracking-tight uppercase leading-tight"
+                  style={{ color: project.color }}>
+                  {project.title}
+                </h2>
               </div>
-            );
-          })}
+
+              {/* Border glow */}
+              <div className="absolute inset-0 rounded-lg pointer-events-none"
+                style={{ boxShadow: `0 0 40px ${project.color}15, 0 15px 40px rgba(0,0,0,0.5)` }}
+              />
+            </div>
+          ))}
         </div>
 
-        {/* Nav Arrows */}
-        <button onClick={prev} disabled={currentIndex === 0 || isAnimating}
-          className="nav-arrow absolute left-3 md:left-6 top-1/2 -translate-y-1/2 z-30
-                     w-12 h-12 rounded-full bg-black/30 border border-white/10
-                     flex items-center justify-center text-white/70 backdrop-blur-sm">
-          <ChevronLeft size={22} />
-        </button>
-        <button onClick={next} disabled={currentIndex === projects.length - 1 || isAnimating}
-          className="nav-arrow absolute right-3 md:right-6 top-1/2 -translate-y-1/2 z-30
-                     w-12 h-12 rounded-full bg-black/30 border border-white/10
-                     flex items-center justify-center text-white/70 backdrop-blur-sm">
-          <ChevronRight size={22} />
-        </button>
-
-        {/* Progress indicator */}
-        <div className="absolute bottom-[2vh] left-1/2 -translate-x-1/2 flex items-center gap-3 z-20">
-          {projects.map((_, i) => (
-            <button key={i} onClick={() => goTo(i)} disabled={isAnimating}
-              className={`rounded-full transition-all duration-500
-                ${i === currentIndex
-                  ? 'w-3 h-3 bg-white/70'
-                  : 'w-2 h-2 bg-white/20 hover:bg-white/30'}`}
-            />
-          ))}
+        {/* Orbit status */}
+        <div className="absolute bottom-[3vh] left-1/2 -translate-x-1/2 z-20">
+          <span className="text-[10px] tracking-[0.2em] uppercase text-white/20">
+            {isHoveringOrbit ? 'Paused' : 'Orbiting'}
+          </span>
         </div>
       </section>
 
@@ -489,7 +382,6 @@ function App() {
       {/* ═══ ABOUT — right side flowing description text ═══ */}
       <section ref={aboutRef} id="about" className="relative py-28 md:py-36 px-8 md:px-14 border-t border-white/[0.06] overflow-hidden">
         <div className="relative z-10 max-w-6xl mx-auto grid lg:grid-cols-2 gap-20">
-          {/* Left: heading + process steps */}
           <div className="about-left">
             <span className="text-[11px] tracking-[0.2em] uppercase text-white/30">Studio</span>
             <h2 className="mt-4 text-4xl md:text-5xl font-light tracking-[-0.03em] text-white/85 leading-tight" style={{ fontFamily: "'Playfair Display', Georgia, serif" }}>
@@ -505,7 +397,6 @@ function App() {
             </div>
           </div>
 
-          {/* Right: flowing description text that loops vertically */}
           <div className="about-right relative h-[360px] md:h-[420px] overflow-hidden"
             style={{ maskImage: 'linear-gradient(to bottom, transparent 0%, black 12%, black 88%, transparent 100%)' }}>
             <div className="vertical-flow-text">

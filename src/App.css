@@ -1,13 +1,15 @@
-/* ─── 3D Perspective Carousel ─── */
-.carousel-scene {
-  perspective: 1200px;
-  perspective-origin: 50% 50%;
+/* ─── Orbital Carousel ─── */
+.orbit-stage {
+  perspective: 1000px;
 }
 
-.carousel-card {
+.orbit-card {
   will-change: transform, opacity, filter;
-  backface-visibility: hidden;
-  transform-style: preserve-3d;
+  transition: box-shadow 0.4s ease;
+}
+
+.orbit-card:hover {
+  box-shadow: 0 0 50px rgba(255,255,255,0.08), 0 20px 50px rgba(0,0,0,0.6);
 }
 
 /* ─── Fade-in animations ─── */
