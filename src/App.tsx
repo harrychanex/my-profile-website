@@ -494,59 +494,51 @@ function App() {
         </div>
       </section>
 
-      {/* ═══ ABOUT — with vertical flowing text ═══ */}
+      {/* ═══ ABOUT — with vertical flowing text on right ═══ */}
       <section ref={aboutRef} id="about" className="relative py-28 md:py-36 px-8 md:px-14 border-t border-white/[0.06] overflow-hidden">
-
-        {/* Vertical flowing words — decorative background */}
-        <div className="absolute right-0 top-0 bottom-0 w-[300px] md:w-[400px] overflow-hidden pointer-events-none select-none"
-          style={{ maskImage: 'linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%)' }}>
-          <div className="vertical-flow-track">
-            {[...flowingWords, ...flowingWords].map((word, i) => (
-              <div key={i} className="py-4 md:py-5 text-right pr-8 md:pr-14">
-                <span className="text-3xl md:text-5xl font-light tracking-[-0.02em] text-white/[0.04]"
-                  style={{ fontFamily: "'Playfair Display', Georgia, serif" }}>
-                  {word}
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
-
         <div className="relative z-10 max-w-6xl mx-auto grid lg:grid-cols-2 gap-20">
+          {/* Left: heading only */}
           <div className="about-left">
             <span className="text-[11px] tracking-[0.2em] uppercase text-white/30">Studio</span>
             <h2 className="mt-4 text-4xl md:text-5xl font-light tracking-[-0.03em] text-white/85 leading-tight" style={{ fontFamily: "'Playfair Display', Georgia, serif" }}>
               Design that<br />moves people
             </h2>
+          </div>
 
-            {/* Inline flowing words preview */}
-            <div className="mt-10 h-[180px] overflow-hidden relative"
-              style={{ maskImage: 'linear-gradient(to bottom, transparent 0%, black 20%, black 80%, transparent 100%)' }}>
-              <div className="vertical-flow-inline">
-                {[...flowingWords, ...flowingWords].map((word, i) => (
-                  <div key={i} className="py-2">
-                    <span className="text-lg md:text-xl tracking-[0.15em] uppercase text-white/15 font-light">
-                      {word}
-                    </span>
+          {/* Right: description + process + vertical flowing text */}
+          <div className="about-right relative flex flex-col justify-center">
+            <div className="space-y-6">
+              <p className="text-lg text-white/35 leading-relaxed">
+                Crafting premium digital experiences where every element serves a purpose and every interaction feels intentional.
+              </p>
+              <p className="text-base text-white/25 leading-relaxed">
+                From concept to launch, we partner with forward-thinking brands to create websites that are as functional as they are beautiful.
+              </p>
+              <div className="pt-4 flex gap-8">
+                {['Concept', 'Design', 'Develop', 'Launch'].map((step, i) => (
+                  <div key={step} className="about-step">
+                    <div className="text-[10px] text-white/15 mb-2">{String(i + 1).padStart(2, '0')}</div>
+                    <div className="text-sm font-medium text-white/40 tracking-tight">{step}</div>
                   </div>
                 ))}
               </div>
             </div>
-          </div>
-          <div className="about-right space-y-6 flex flex-col justify-center">
-            <p className="text-lg text-white/35 leading-relaxed">
-              Crafting premium digital experiences where every element serves a purpose and every interaction feels intentional.
-            </p>
-            <p className="text-base text-white/25 leading-relaxed">
-              From concept to launch, we partner with forward-thinking brands to create websites that are as functional as they are beautiful.
-            </p>
-            <div className="pt-4 flex gap-8">
-              {['Concept', 'Design', 'Develop', 'Launch'].map((step, i) => (
-                <div key={step} className="about-step">
-                  <div className="text-[10px] text-white/15 mb-2">{String(i + 1).padStart(2, '0')}</div>
-                  <div className="text-sm font-medium text-white/40 tracking-tight">{step}</div>
-                </div>
-              ))}
+
+            {/* Vertical flowing words — right side */}
+            <div className="mt-10 h-[220px] overflow-hidden relative"
+              style={{ maskImage: 'linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%)' }}>
+              <div className="vertical-flow-inline">
+                {[...flowingWords, ...flowingWords].map((word, i) => (
+                  <div key={i} className="py-3 flex items-center gap-4">
+                    <span className="text-[10px] text-white/10 font-mono">{String((i % flowingWords.length) + 1).padStart(2, '0')}</span>
+                    <span className="text-lg md:text-xl tracking-[0.12em] uppercase text-white/15 font-light"
+                      style={{ fontFamily: "'Playfair Display', Georgia, serif" }}>
+                      {word}
+                    </span>
+                    <span className="flex-1 h-px bg-white/[0.04]" />
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </div>
