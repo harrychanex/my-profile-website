@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useCallback } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Menu, X } from 'lucide-react';
@@ -67,7 +67,6 @@ function App() {
     const N = projects.length;
     const speed = 0.003; // radians per frame
     const radiusX = 340; // horizontal spread (px)
-    const radiusZ = 220; // depth spread (conceptual)
     const verticalShift = 30; // cards at back shift up slightly
 
     let rafId: number;
