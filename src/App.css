@@ -39,22 +39,16 @@
   animation: marquee 40s linear infinite;
 }
 
-/* ─── Vertical Flowing Text (About section - large background) ─── */
-@keyframes verticalFlow {
+/* ─── Vertical Flowing Description Text (About section) ─── */
+@keyframes verticalFlowText {
   0%   { transform: translateY(0); }
   100% { transform: translateY(-50%); }
 }
-.vertical-flow-track {
-  animation: verticalFlow 30s linear infinite;
+.vertical-flow-text {
+  animation: verticalFlowText 35s linear infinite;
 }
-
-/* ─── Vertical Flowing Text (About section - inline smaller) ─── */
-@keyframes verticalFlowInline {
-  0%   { transform: translateY(0); }
-  100% { transform: translateY(-50%); }
-}
-.vertical-flow-inline {
-  animation: verticalFlowInline 20s linear infinite;
+.vertical-flow-text:hover {
+  animation-play-state: paused;
 }
 
 /* ─── Nav arrows ─── */

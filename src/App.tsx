@@ -50,14 +50,6 @@ const projects = [
   },
 ];
 
-/* ─── Vertical flowing text words ─── */
-const flowingWords = [
-  'Empathy', 'Clarity', 'Motion', 'Rhythm', 'Balance',
-  'Contrast', 'Depth', 'Flow', 'Harmony', 'Impact',
-  'Vision', 'Craft', 'Detail', 'Purpose', 'Story',
-  'Emotion', 'Space', 'Light', 'Form', 'Energy',
-];
-
 function App() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -494,51 +486,55 @@ function App() {
         </div>
       </section>
 
-      {/* ═══ ABOUT — with vertical flowing text on right ═══ */}
+      {/* ═══ ABOUT — right side flowing description text ═══ */}
       <section ref={aboutRef} id="about" className="relative py-28 md:py-36 px-8 md:px-14 border-t border-white/[0.06] overflow-hidden">
         <div className="relative z-10 max-w-6xl mx-auto grid lg:grid-cols-2 gap-20">
-          {/* Left: heading only */}
+          {/* Left: heading + process steps */}
           <div className="about-left">
             <span className="text-[11px] tracking-[0.2em] uppercase text-white/30">Studio</span>
             <h2 className="mt-4 text-4xl md:text-5xl font-light tracking-[-0.03em] text-white/85 leading-tight" style={{ fontFamily: "'Playfair Display', Georgia, serif" }}>
               Design that<br />moves people
             </h2>
+            <div className="mt-12 flex gap-8">
+              {['Concept', 'Design', 'Develop', 'Launch'].map((step, i) => (
+                <div key={step} className="about-step">
+                  <div className="text-[10px] text-white/15 mb-2">{String(i + 1).padStart(2, '0')}</div>
+                  <div className="text-sm font-medium text-white/40 tracking-tight">{step}</div>
+                </div>
+              ))}
+            </div>
           </div>
 
-          {/* Right: description + process + vertical flowing text */}
-          <div className="about-right relative flex flex-col justify-center">
-            <div className="space-y-6">
-              <p className="text-lg text-white/35 leading-relaxed">
-                Crafting premium digital experiences where every element serves a purpose and every interaction feels intentional.
-              </p>
-              <p className="text-base text-white/25 leading-relaxed">
-                From concept to launch, we partner with forward-thinking brands to create websites that are as functional as they are beautiful.
-              </p>
-              <div className="pt-4 flex gap-8">
-                {['Concept', 'Design', 'Develop', 'Launch'].map((step, i) => (
-                  <div key={step} className="about-step">
-                    <div className="text-[10px] text-white/15 mb-2">{String(i + 1).padStart(2, '0')}</div>
-                    <div className="text-sm font-medium text-white/40 tracking-tight">{step}</div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Vertical flowing words — right side */}
-            <div className="mt-10 h-[220px] overflow-hidden relative"
-              style={{ maskImage: 'linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%)' }}>
-              <div className="vertical-flow-inline">
-                {[...flowingWords, ...flowingWords].map((word, i) => (
-                  <div key={i} className="py-3 flex items-center gap-4">
-                    <span className="text-[10px] text-white/10 font-mono">{String((i % flowingWords.length) + 1).padStart(2, '0')}</span>
-                    <span className="text-lg md:text-xl tracking-[0.12em] uppercase text-white/15 font-light"
-                      style={{ fontFamily: "'Playfair Display', Georgia, serif" }}>
-                      {word}
-                    </span>
-                    <span className="flex-1 h-px bg-white/[0.04]" />
-                  </div>
-                ))}
-              </div>
+          {/* Right: flowing description text that loops vertically */}
+          <div className="about-right relative h-[360px] md:h-[420px] overflow-hidden"
+            style={{ maskImage: 'linear-gradient(to bottom, transparent 0%, black 12%, black 88%, transparent 100%)' }}>
+            <div className="vertical-flow-text">
+              {[0, 1].map((copy) => (
+                <div key={copy} className="space-y-8 pb-8">
+                  <p className="text-lg text-white/35 leading-relaxed">
+                    Crafting premium digital experiences where every element serves a purpose and every interaction feels intentional.
+                  </p>
+                  <p className="text-base text-white/25 leading-relaxed">
+                    From concept to launch, we partner with forward-thinking brands to create websites that are as functional as they are beautiful.
+                  </p>
+                  <p className="text-base text-white/25 leading-relaxed">
+                    We believe great design is invisible — it guides without dictating, communicates without noise, and creates space for content to breathe.
+                  </p>
+                  <p className="text-base text-white/25 leading-relaxed">
+                    Every pixel is placed with intent. Every animation timed to feel natural. We obsess over the details most people never notice — because those details are what separate good from unforgettable.
+                  </p>
+                  <p className="text-base text-white/25 leading-relaxed">
+                    Our process starts with listening. Understanding your audience, your goals, and the story you need to tell. Then we distill that into a visual language that speaks louder than words.
+                  </p>
+                  <p className="text-base text-white/25 leading-relaxed">
+                    Performance is not an afterthought. We build fast, accessible, and responsive — because the best design in the world means nothing if nobody waits for it to load.
+                  </p>
+                  <p className="text-base text-white/25 leading-relaxed">
+                    We treat every project as a collaboration, not a transaction. Your ambition drives the work. Our craft shapes the execution.
+                  </p>
+                  <div className="h-px w-full bg-white/[0.06]" />
+                </div>
+              ))}
             </div>
           </div>
         </div>
