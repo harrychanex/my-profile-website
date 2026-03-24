@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { ChevronLeft, ChevronRight, Menu, X } from 'lucide-react';
+import { Menu, X, Plus, Minus } from 'lucide-react';
 import './App.css';
 
 gsap.registerPlugin(ScrollTrigger);
@@ -11,157 +11,384 @@ const projects = [
   {
     id: 1,
     title: 'Lumina Lounge',
-    category: 'Chapter 1',
-    subtitle: 'Hospitality Experience',
-    image: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80',
-    color: '#c9a84c',
+    category: 'Hospitality',
+    description: 'A premium hospitality experience with immersive digital presence.',
+    image: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80',
   },
   {
     id: 2,
     title: 'Nova Academy',
-    category: 'Chapter 2',
-    subtitle: 'Education Platform',
-    image: 'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80',
-    color: '#e85d9a',
+    category: 'Education',
+    description: 'Modern education platform designed for the next generation.',
+    image: 'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=1200&q=80',
   },
   {
     id: 3,
     title: 'Aether AI',
-    category: 'Chapter 3',
-    subtitle: 'Technology Product',
-    image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=800&q=80',
-    color: '#c94040',
+    category: 'Technology',
+    description: 'Cutting-edge AI product with intuitive user experience.',
+    image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=1200&q=80',
   },
   {
     id: 4,
     title: 'Monarch Estates',
-    category: 'Chapter 4',
-    subtitle: 'Real Estate',
-    image: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=800&q=80',
-    color: '#5ba3c9',
+    category: 'Real Estate',
+    description: 'Luxury real estate brand with sophisticated digital presence.',
+    image: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1200&q=80',
   },
   {
     id: 5,
     title: 'Pulse Fitness',
-    category: 'Chapter 5',
-    subtitle: 'Wellness Brand',
-    image: 'https://images.unsplash.com/photo-1628155930542-3c7a64e2c848?auto=format&fit=crop&w=800&q=80',
-    color: '#6dba6d',
+    category: 'Wellness',
+    description: 'Dynamic wellness brand connecting people with health.',
+    image: 'https://images.unsplash.com/photo-1628155930542-3c7a64e2c848?auto=format&fit=crop&w=1200&q=80',
   },
 ];
 
-function App() {
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [isAnimating, setIsAnimating] = useState(false);
-  const cardsRef = useRef<(HTMLDivElement | null)[]>([]);
-  const heroRef = useRef<HTMLElement>(null);
-  const statsRef = useRef<HTMLElement>(null);
-  const worksRef = useRef<HTMLElement>(null);
-  const aboutRef = useRef<HTMLElement>(null);
-  const servicesRef = useRef<HTMLElement>(null);
-  const ctaRef = useRef<HTMLElement>(null);
+const categories = ['All', 'Hospitality', 'Education', 'Technology', 'Real Estate', 'Wellness'];
 
-  /* ─── Arc position: 3 cards visible, center clear, sides blurred ─── */
-  const getArcTransform = useCallback((index: number, active: number) => {
-    const N = projects.length;
-    // Signed offset from active: -2, -1, 0, +1, +2 (wraps around)
-    let diff = index - active;
-    if (diff > N / 2) diff -= N;
-    if (diff < -N / 2) diff += N;
+const services = [
+  {
+    title: 'Web Design',
+    description: 'Pixel-perfect interfaces crafted for conversion and delight. Every layout decision is intentional.',
+    image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=800&q=80',
+  },
+  {
+    title: 'Development',
+    description: 'Clean, performant code that brings designs to life with precision and speed.',
+    image: 'https://images.unsplash.com/photo-1551650975-87deedd944c3?auto=format&fit=crop&w=800&q=80',
+  },
+  {
+    title: 'Brand Identity',
+    description: 'Visual systems that communicate with clarity and resonate with your audience.',
+    image: 'https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&w=800&q=80',
+  },
+  {
+    title: 'Motion Design',
+    description: 'Subtle animations that elevate the experience and guide users naturally.',
+    image: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=800&q=80',
+  },
+];
 
-    // Arc geometry: cards sit along a semicircle
-    const arcSpread = 55; // degrees between each card
-    const angleDeg = diff * arcSpread;
-    const angleRad = (angleDeg * Math.PI) / 180;
-    const radiusX = 420;
-    const radiusY = 120;
+const faqs = [
+  {
+    question: 'What does your design process look like?',
+    answer: 'We start with a discovery phase to understand your goals, audience, and competitive landscape. From there we move into strategy, wireframing, visual design, and development — with your input at every stage. The result is a product that truly reflects your brand.',
+  },
+  {
+    question: 'How long does a typical project take?',
+    answer: 'Most projects run between 6 and 12 weeks depending on scope. A focused brand identity refresh can be completed in 3–4 weeks, while a full website build with custom interactions typically takes 8–12 weeks. We\'ll provide a clear timeline before work begins.',
+  },
+  {
+    question: 'Do you work with startups and early-stage companies?',
+    answer: 'Absolutely. Some of our best work has been with early-stage companies who needed to establish a strong brand presence quickly. We offer flexible engagement models to suit different budgets and timelines.',
+  },
+  {
+    question: 'What technologies do you build with?',
+    answer: 'We work primarily with React, Next.js, and Webflow for web builds, paired with Framer Motion or GSAP for animations. For e-commerce we use Shopify. We always recommend the right tool for the job rather than forcing a single stack.',
+  },
+  {
+    question: 'Do you offer ongoing support after launch?',
+    answer: 'Yes. We offer monthly retainer packages for ongoing design, development, and content updates. Many clients continue working with us after launch to iterate on features and keep their digital presence sharp.',
+  },
+];
 
-    const x = Math.sin(angleRad) * radiusX;
-    const y = (1 - Math.cos(angleRad)) * radiusY; // 0 at center, rises on sides
+/* ─── Globe Canvas Component ─── */
+function GlobeCanvas() {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const frameRef = useRef<number>(0);
 
-    const absDiff = Math.abs(diff);
-    const scale = absDiff === 0 ? 1 : absDiff === 1 ? 0.8 : 0.6;
-    const opacity = absDiff <= 1 ? 1 : absDiff === 2 ? 0.4 : 0;
-    const blur = absDiff === 0 ? 0 : absDiff === 1 ? 3 : 6;
-    const brightness = absDiff === 0 ? 1 : 0.5;
-    const zIndex = 10 - absDiff;
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
 
-    return { x, y, scale, opacity, blur, brightness, zIndex };
+    let width = canvas.offsetWidth;
+    let height = canvas.offsetHeight;
+    canvas.width = width;
+    canvas.height = height;
+
+    const DOT_COUNT = 1200;
+    const RADIUS = Math.min(width, height) * 0.38;
+    let angle = 0;
+
+    // Pre-compute dots on a sphere using Fibonacci lattice
+    const dots: { theta: number; phi: number }[] = [];
+    const goldenAngle = Math.PI * (3 - Math.sqrt(5));
+    for (let i = 0; i < DOT_COUNT; i++) {
+      const y = 1 - (i / (DOT_COUNT - 1)) * 2;
+      const r = Math.sqrt(1 - y * y);
+      const theta = goldenAngle * i;
+      dots.push({ theta, phi: Math.asin(y) });
+      void r; // used in render loop below
+    }
+
+    function render() {
+      if (!ctx || !canvas) return;
+      ctx.clearRect(0, 0, width, height);
+      angle += 0.003;
+
+      const cx = width / 2;
+      const cy = height / 2;
+
+      for (let i = 0; i < DOT_COUNT; i++) {
+        const { theta, phi } = dots[i];
+        const rotTheta = theta + angle;
+
+        // 3D sphere coords
+        const x3 = RADIUS * Math.cos(phi) * Math.cos(rotTheta);
+        const y3 = RADIUS * Math.sin(phi);
+        const z3 = RADIUS * Math.cos(phi) * Math.sin(rotTheta);
+
+        // Simple perspective projection
+        const fov = RADIUS * 2.5;
+        const scale = fov / (fov + z3 + RADIUS);
+        const px = cx + x3 * scale;
+        const py = cy - y3 * scale;
+
+        // Depth-based opacity
+        const normalizedZ = (z3 + RADIUS) / (2 * RADIUS);
+        const alpha = 0.15 + normalizedZ * 0.85;
+        const dotSize = 0.8 + normalizedZ * 1.0;
+
+        ctx.beginPath();
+        ctx.arc(px, py, dotSize, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(255,255,255,${alpha.toFixed(2)})`;
+        ctx.fill();
+      }
+
+      frameRef.current = requestAnimationFrame(render);
+    }
+
+    render();
+
+    const onResize = () => {
+      if (!canvas) return;
+      width = canvas.offsetWidth;
+      height = canvas.offsetHeight;
+      canvas.width = width;
+      canvas.height = height;
+    };
+    window.addEventListener('resize', onResize);
+
+    return () => {
+      cancelAnimationFrame(frameRef.current);
+      window.removeEventListener('resize', onResize);
+    };
   }, []);
 
-  /* ─── Navigate ─── */
-  const goTo = useCallback((index: number) => {
-    if (isAnimating) return;
+  return <canvas ref={canvasRef} id="globe-canvas" />;
+}
+
+/* ─── FAQ Item Component ─── */
+function FaqItem({ question, answer, index }: { question: string; answer: string; index: number }) {
+  const [open, setOpen] = useState(false);
+  const answerRef = useRef<HTMLDivElement>(null);
+
+  return (
+    <div
+      className="border-b"
+      style={{ borderColor: 'rgba(255,255,255,0.08)' }}
+    >
+      <button
+        onClick={() => setOpen(!open)}
+        className="w-full flex items-start justify-between py-8 text-left gap-6"
+        aria-expanded={open}
+      >
+        <span
+          className="flex-1 leading-tight"
+          style={{
+            fontSize: 'clamp(20px, 2.5vw, 32px)',
+            fontWeight: 300,
+            color: 'rgba(255,255,255,0.9)',
+            letterSpacing: '-0.02em',
+            fontFamily: "'Inter', sans-serif",
+          }}
+        >
+          {String(index + 1).padStart(2, '0')}. {question}
+        </span>
+        <span className="flex-shrink-0 mt-1" style={{ color: 'rgba(255,255,255,0.4)' }}>
+          {open ? <Minus size={20} /> : <Plus size={20} />}
+        </span>
+      </button>
+      <div
+        ref={answerRef}
+        className="faq-answer"
+        style={{
+          maxHeight: open ? `${answerRef.current?.scrollHeight ?? 400}px` : '0px',
+          opacity: open ? 1 : 0,
+        }}
+      >
+        <p
+          className="pb-8 max-w-[700px] leading-relaxed"
+          style={{
+            fontSize: '14.6px',
+            color: 'rgba(255,255,255,0.5)',
+          }}
+        >
+          {answer}
+        </p>
+      </div>
+    </div>
+  );
+}
+
+/* ─── Main App ─── */
+function App() {
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [navScrolled, setNavScrolled] = useState(false);
+  const [activeCategory, setActiveCategory] = useState('All');
+  const [heroIndex, setHeroIndex] = useState(0);
+  const [servicesPage, setServicesPage] = useState(0);
+
+  const navRef = useRef<HTMLElement>(null);
+  const heroCardsRef = useRef<(HTMLDivElement | null)[]>([]);
+  const statsRef = useRef<HTMLElement>(null);
+  const worksRef = useRef<HTMLElement>(null);
+  const servicesRef = useRef<HTMLElement>(null);
+  const trustRef = useRef<HTMLElement>(null);
+  const faqRef = useRef<HTMLElement>(null);
+  const ctaRef = useRef<HTMLElement>(null);
+  const autoTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const isAnimatingRef = useRef(false);
+
+  /* ─── Navbar scroll ─── */
+  useEffect(() => {
+    const onScroll = () => setNavScrolled(window.scrollY > 40);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  /* ─── Hero carousel helpers ─── */
+  const getCardStyle = useCallback((index: number, active: number) => {
+    const total = projects.length;
+    let diff = index - active;
+    if (diff > total / 2) diff -= total;
+    if (diff < -total / 2) diff += total;
+
+    const absDiff = Math.abs(diff);
+    if (absDiff > 1) return null; // only show center and immediate neighbors
+
+    // Card geometry
+    const cardW = typeof window !== 'undefined' ? Math.min(window.innerWidth * 0.48, 520) : 480;
+    const gap = 24;
+
+    const x = diff * (cardW + gap);
+    const rotate = diff * -2; // -2deg left, +2deg right (opposite to diff direction)
+    const scale = absDiff === 0 ? 1 : 0.9;
+    const zIndex = absDiff === 0 ? 10 : 5;
+    const overlayOpacity = absDiff === 0 ? 0 : 0.4;
+
+    return { x, rotate, scale, zIndex, overlayOpacity };
+  }, []);
+
+  const goToHero = useCallback((target: number) => {
+    if (isAnimatingRef.current) return;
     const N = projects.length;
-    const target = ((index % N) + N) % N;
-    if (target === currentIndex) return;
-    setIsAnimating(true);
+    const next = ((target % N) + N) % N;
 
-    cardsRef.current.forEach((card, i) => {
+    isAnimatingRef.current = true;
+    heroCardsRef.current.forEach((card, i) => {
       if (!card) return;
-      const s = getArcTransform(i, target);
-      gsap.to(card, {
-        x: s.x, y: s.y, scale: s.scale, opacity: s.opacity,
-        filter: `blur(${s.blur}px) brightness(${s.brightness})`,
-        zIndex: s.zIndex,
-        duration: 0.8,
-        ease: 'power3.inOut',
-        onComplete: i === 0 ? () => {
-          setCurrentIndex(target);
-          setIsAnimating(false);
-        } : undefined,
-      });
+      const style = getCardStyle(i, next);
+      if (style) {
+        gsap.to(card, {
+          x: style.x,
+          rotation: style.rotate,
+          scale: style.scale,
+          opacity: 1,
+          duration: 0.7,
+          ease: 'power3.inOut',
+          zIndex: style.zIndex,
+          onComplete: i === 0 ? () => {
+            isAnimatingRef.current = false;
+          } : undefined,
+        });
+        // Update the dark overlay
+        const overlay = card.querySelector<HTMLDivElement>('.card-overlay');
+        if (overlay) {
+          gsap.to(overlay, { opacity: style.overlayOpacity, duration: 0.5 });
+        }
+      } else {
+        gsap.to(card, { opacity: 0, duration: 0.3, zIndex: 0 });
+      }
     });
-  }, [currentIndex, isAnimating, getArcTransform]);
 
-  const next = useCallback(() => goTo(currentIndex + 1), [currentIndex, goTo]);
-  const prev = useCallback(() => goTo(currentIndex - 1), [currentIndex, goTo]);
+    setHeroIndex(next);
+  }, [getCardStyle]);
 
-  /* ─── Set initial positions ─── */
+  /* ─── Set initial hero card positions ─── */
   useEffect(() => {
-    cardsRef.current.forEach((card, i) => {
+    heroCardsRef.current.forEach((card, i) => {
       if (!card) return;
-      const s = getArcTransform(i, 0);
-      gsap.fromTo(card,
-        { x: s.x, y: s.y + 60, scale: s.scale, opacity: 0,
-          filter: `blur(${s.blur}px) brightness(${s.brightness})`, zIndex: s.zIndex },
-        { x: s.x, y: s.y, opacity: s.opacity,
-          filter: `blur(${s.blur}px) brightness(${s.brightness})`,
-          duration: 1.2, delay: 0.3 + i * 0.08, ease: 'power2.out' }
-      );
-    });
-  }, [getArcTransform]);
+      const style = getCardStyle(i, 0);
+      if (style) {
+        gsap.set(card, {
+          x: style.x,
+          rotation: style.rotate,
+          scale: style.scale,
+          opacity: 0,
+          zIndex: style.zIndex,
+        });
+        const overlay = card.querySelector<HTMLDivElement>('.card-overlay');
+        if (overlay) gsap.set(overlay, { opacity: style.overlayOpacity });
 
-  /* ─── Keyboard nav ─── */
+        gsap.to(card, {
+          opacity: 1,
+          y: 0,
+          duration: 1,
+          delay: 0.5 + i * 0.1,
+          ease: 'power2.out',
+        });
+      } else {
+        gsap.set(card, { opacity: 0, zIndex: 0 });
+      }
+    });
+  }, [getCardStyle]);
+
+  /* ─── Hero auto-advance ─── */
   useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'ArrowRight') next();
-      if (e.key === 'ArrowLeft') prev();
+    const schedule = () => {
+      autoTimerRef.current = setTimeout(() => {
+        setHeroIndex(prev => {
+          const next = (prev + 1) % projects.length;
+          goToHero(next);
+          return prev; // state will be updated inside goToHero
+        });
+        schedule();
+      }, 5000);
     };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [next, prev]);
+    schedule();
+    return () => {
+      if (autoTimerRef.current) clearTimeout(autoTimerRef.current);
+    };
+  }, [goToHero]);
 
   /* ─── ScrollTrigger animations ─── */
   useEffect(() => {
     const ctx = gsap.context(() => {
-      // Stats
+      // Stats — counter animation
       if (statsRef.current) {
-        const statEls = statsRef.current.querySelectorAll('.stat-item');
-        gsap.fromTo(statEls, { y: 40, opacity: 0 }, {
-          y: 0, opacity: 1, duration: 0.8, stagger: 0.15, ease: 'power2.out',
-          scrollTrigger: { trigger: statsRef.current, start: 'top 80%' },
-        });
-        const counters = statsRef.current.querySelectorAll('.stat-number');
-        counters.forEach((el) => {
-          const target = parseInt(el.getAttribute('data-target') || '0', 10);
+        const statEls = statsRef.current.querySelectorAll<HTMLElement>('.stat-item');
+        gsap.fromTo(statEls,
+          { y: 50, opacity: 0 },
+          {
+            y: 0, opacity: 1, duration: 0.9, stagger: 0.15, ease: 'power2.out',
+            scrollTrigger: { trigger: statsRef.current, start: 'top 80%' },
+          }
+        );
+        statsRef.current.querySelectorAll<HTMLElement>('.stat-number').forEach(el => {
+          const target = parseInt(el.getAttribute('data-target') ?? '0', 10);
+          const suffix = el.getAttribute('data-suffix') ?? '';
           const obj = { val: 0 };
           gsap.to(obj, {
-            val: target, duration: 2, ease: 'power2.out',
+            val: target,
+            duration: 2.5,
+            ease: 'power2.out',
             scrollTrigger: { trigger: statsRef.current, start: 'top 80%' },
-            onUpdate: () => {
-              el.textContent = Math.round(obj.val) + (el.getAttribute('data-suffix') || '');
+            onUpdate() {
+              el.textContent = Math.round(obj.val) + suffix;
             },
           });
         });
@@ -169,269 +396,517 @@ function App() {
 
       // Selected Works
       if (worksRef.current) {
-        const heading = worksRef.current.querySelector('.works-heading');
-        if (heading) {
-          gsap.fromTo(heading, { y: 60, opacity: 0 }, {
+        gsap.fromTo(
+          worksRef.current.querySelector('.works-header'),
+          { y: 60, opacity: 0 },
+          {
             y: 0, opacity: 1, duration: 1, ease: 'power2.out',
-            scrollTrigger: { trigger: heading, start: 'top 85%' },
-          });
-        }
-        const cards = worksRef.current.querySelectorAll('.work-card');
-        gsap.fromTo(cards, { y: 80, opacity: 0, scale: 0.95 }, {
-          y: 0, opacity: 1, scale: 1, duration: 0.9, stagger: 0.2, ease: 'power2.out',
-          scrollTrigger: { trigger: worksRef.current.querySelector('.works-grid'), start: 'top 80%' },
-        });
-      }
-
-      // About
-      if (aboutRef.current) {
-        const left = aboutRef.current.querySelector('.about-left');
-        const right = aboutRef.current.querySelector('.about-right');
-        if (left) gsap.fromTo(left, { x: -80, opacity: 0 }, {
-          x: 0, opacity: 1, duration: 1, ease: 'power2.out',
-          scrollTrigger: { trigger: aboutRef.current, start: 'top 75%' },
-        });
-        if (right) gsap.fromTo(right, { x: 80, opacity: 0 }, {
-          x: 0, opacity: 1, duration: 1, delay: 0.2, ease: 'power2.out',
-          scrollTrigger: { trigger: aboutRef.current, start: 'top 75%' },
-        });
+            scrollTrigger: { trigger: worksRef.current, start: 'top 80%' },
+          }
+        );
+        gsap.fromTo(
+          worksRef.current.querySelectorAll('.work-card'),
+          { y: 80, opacity: 0 },
+          {
+            y: 0, opacity: 1, duration: 0.9, stagger: 0.18, ease: 'power2.out',
+            scrollTrigger: { trigger: worksRef.current.querySelector('.works-grid'), start: 'top 80%' },
+          }
+        );
       }
 
       // Services
       if (servicesRef.current) {
-        const heading = servicesRef.current.querySelector('.services-heading');
-        if (heading) gsap.fromTo(heading, { y: 40, opacity: 0 }, {
-          y: 0, opacity: 1, duration: 0.8, ease: 'power2.out',
-          scrollTrigger: { trigger: heading, start: 'top 85%' },
-        });
-        const cards = servicesRef.current.querySelectorAll('.service-card');
-        gsap.fromTo(cards, { y: 60, opacity: 0 }, {
-          y: 0, opacity: 1, duration: 0.7, stagger: 0.12, ease: 'power2.out',
-          scrollTrigger: { trigger: servicesRef.current.querySelector('.services-grid'), start: 'top 80%' },
-        });
+        gsap.fromTo(
+          servicesRef.current.querySelector('.services-header'),
+          { y: 50, opacity: 0 },
+          {
+            y: 0, opacity: 1, duration: 0.9, ease: 'power2.out',
+            scrollTrigger: { trigger: servicesRef.current, start: 'top 80%' },
+          }
+        );
+      }
+
+      // Trust Banner
+      if (trustRef.current) {
+        gsap.fromTo(
+          trustRef.current.querySelectorAll('.trust-item'),
+          { y: 40, opacity: 0 },
+          {
+            y: 0, opacity: 1, duration: 0.9, stagger: 0.15, ease: 'power2.out',
+            scrollTrigger: { trigger: trustRef.current, start: 'top 80%' },
+          }
+        );
+      }
+
+      // FAQ
+      if (faqRef.current) {
+        gsap.fromTo(
+          faqRef.current.querySelector('.faq-header'),
+          { y: 40, opacity: 0 },
+          {
+            y: 0, opacity: 1, duration: 0.9, ease: 'power2.out',
+            scrollTrigger: { trigger: faqRef.current, start: 'top 80%' },
+          }
+        );
       }
 
       // CTA
       if (ctaRef.current) {
-        const h2 = ctaRef.current.querySelector('h2');
-        const p = ctaRef.current.querySelector('p');
-        const btn = ctaRef.current.querySelector('.cta-btn');
-        if (h2) gsap.fromTo(h2, { y: 50, opacity: 0, scale: 0.95 }, {
-          y: 0, opacity: 1, scale: 1, duration: 1, ease: 'power2.out',
-          scrollTrigger: { trigger: ctaRef.current, start: 'top 75%' },
-        });
-        if (p) gsap.fromTo(p, { y: 30, opacity: 0 }, {
-          y: 0, opacity: 1, duration: 0.8, delay: 0.2, ease: 'power2.out',
-          scrollTrigger: { trigger: ctaRef.current, start: 'top 75%' },
-        });
-        if (btn) gsap.fromTo(btn, { y: 20, opacity: 0 }, {
-          y: 0, opacity: 1, duration: 0.7, delay: 0.4, ease: 'power2.out',
-          scrollTrigger: { trigger: ctaRef.current, start: 'top 75%' },
-        });
+        gsap.fromTo(
+          ctaRef.current.querySelectorAll('.cta-anim'),
+          { y: 50, opacity: 0 },
+          {
+            y: 0, opacity: 1, duration: 1, stagger: 0.2, ease: 'power2.out',
+            scrollTrigger: { trigger: ctaRef.current, start: 'top 75%' },
+          }
+        );
       }
     });
     return () => ctx.revert();
   }, []);
 
-  return (
-    <div className="min-h-screen bg-black text-white">
+  /* ─── Filtered projects ─── */
+  const filteredProjects = activeCategory === 'All'
+    ? projects
+    : projects.filter(p => p.category === activeCategory);
 
-      {/* ═══ NAVBAR ═══ */}
-      <nav className="fixed top-0 w-full z-50 flex items-center justify-between px-8 md:px-14 h-20">
-        <a href="#" className="text-sm font-semibold tracking-[0.1em] text-white/80 hover:text-white transition-colors">
+  /* ─── Avatar colors for Trust Banner ─── */
+  const avatarColors = ['#c9a84c', '#e85d9a', '#5ba3c9', '#6dba6d', '#c94040'];
+
+  return (
+    <div className="min-h-screen" style={{ background: '#000', color: '#fff', fontFamily: "'Inter', sans-serif" }}>
+
+      {/* ═══════════════════════════════════════════
+          NAVBAR
+      ═══════════════════════════════════════════ */}
+      <nav
+        ref={navRef}
+        className={`fixed top-0 w-full z-50 flex items-center justify-between transition-all duration-500 ${navScrolled ? 'navbar-scrolled' : ''}`}
+        style={{ padding: '0 56px', height: '72px' }}
+      >
+        <a
+          href="#"
+          style={{
+            fontSize: '13px',
+            fontWeight: 600,
+            letterSpacing: '0.1em',
+            color: 'rgba(255,255,255,0.9)',
+            textDecoration: 'none',
+          }}
+        >
           HARRY CHAN
         </a>
-        <button onClick={() => setMenuOpen(!menuOpen)} className="text-white/40 hover:text-white transition-colors z-50">
+
+        {/* Desktop nav */}
+        <div className="hidden md:flex items-center gap-8">
+          {['Work', 'Services', 'About', 'Contact'].map(item => (
+            <a
+              key={item}
+              href={`#${item.toLowerCase()}`}
+              style={{
+                fontSize: '13.6px',
+                fontWeight: 400,
+                color: 'rgba(255,255,255,0.55)',
+                textDecoration: 'none',
+                transition: 'color 0.2s ease',
+              }}
+              onMouseEnter={e => (e.currentTarget.style.color = '#fff')}
+              onMouseLeave={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.55)')}
+            >
+              {item}
+            </a>
+          ))}
+          <a
+            href="#contact"
+            className="btn-primary"
+            style={{ padding: '10px 22px', fontSize: '12px' }}
+          >
+            Get Started
+          </a>
+        </div>
+
+        {/* Mobile hamburger */}
+        <button
+          onClick={() => setMenuOpen(!menuOpen)}
+          className="md:hidden"
+          style={{ color: 'rgba(255,255,255,0.6)', background: 'none', border: 'none', cursor: 'pointer' }}
+          aria-label="Toggle menu"
+        >
           {menuOpen ? <X size={22} /> : <Menu size={22} />}
         </button>
       </nav>
 
-      {/* ═══ MOBILE MENU ═══ */}
+      {/* Mobile Menu */}
       {menuOpen && (
-        <div className="fixed inset-0 z-40 bg-black/98 backdrop-blur-sm flex flex-col items-center justify-center gap-10"
-          style={{ animation: 'fadeUp 0.3s ease-out forwards' }}>
-          {['Work', 'Services', 'About', 'Contact'].map((item) => (
-            <a key={item} href={`#${item.toLowerCase()}`} onClick={() => setMenuOpen(false)}
-              className="text-4xl md:text-5xl font-light tracking-tight text-white/80 hover:text-white transition-colors"
-              style={{ fontFamily: "'Playfair Display', Georgia, serif" }}>
+        <div
+          className="fixed inset-0 z-40 flex flex-col items-center justify-center gap-10"
+          style={{ background: 'rgba(0,0,0,0.97)', backdropFilter: 'blur(12px)', animation: 'fadeUp 0.3s ease-out both' }}
+        >
+          {['Work', 'Services', 'About', 'Contact'].map(item => (
+            <a
+              key={item}
+              href={`#${item.toLowerCase()}`}
+              onClick={() => setMenuOpen(false)}
+              style={{
+                fontSize: '40px',
+                fontWeight: 300,
+                letterSpacing: '-0.03em',
+                color: 'rgba(255,255,255,0.8)',
+                textDecoration: 'none',
+                transition: 'color 0.2s ease',
+              }}
+              onMouseEnter={e => (e.currentTarget.style.color = '#fff')}
+              onMouseLeave={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.8)')}
+            >
               {item}
             </a>
           ))}
         </div>
       )}
 
-      {/* ═══ HERO — Semicircle Arc Carousel ═══ */}
-      <section ref={heroRef}
-        className="relative w-full h-screen flex flex-col items-center justify-between overflow-hidden py-20">
-
-        {/* Atmospheric background */}
-        <div className="absolute inset-0 pointer-events-none"
+      {/* ═══════════════════════════════════════════
+          HERO
+      ═══════════════════════════════════════════ */}
+      <section
+        style={{
+          position: 'relative',
+          width: '100%',
+          minHeight: '100vh',
+          overflow: 'hidden',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        {/* Background image of active project */}
+        <div
           style={{
-            background: `
-              radial-gradient(ellipse 80% 50% at 50% 30%, rgba(255,255,255,0.03) 0%, transparent 70%),
-              radial-gradient(ellipse 60% 40% at 50% 80%, rgba(255,255,255,0.02) 0%, transparent 60%),
-              linear-gradient(to bottom, #000000 0%, #0a0a0a 40%, #000000 100%)
-            `
+            position: 'absolute',
+            inset: 0,
+            backgroundImage: `url(${projects[heroIndex].image})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            transition: 'background-image 0.8s ease',
+          }}
+        />
+        {/* Gradient overlay */}
+        <div
+          style={{
+            position: 'absolute',
+            inset: 0,
+            background: 'linear-gradient(to bottom, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.35) 40%, rgba(0,0,0,0.75) 75%, #000 100%)',
           }}
         />
 
-        {/* ── Heading (top, never covered) ── */}
-        <div className="relative z-20 flex flex-col items-center text-center px-6 flex-shrink-0">
-          <h1 className="fade-up overflow-visible leading-[0.95]">
-            <span className="block text-[14vw] md:text-[9vw] lg:text-[7.5vw] font-bold tracking-[-0.03em] uppercase"
-              style={{ color: 'rgba(255,255,255,0.85)', letterSpacing: '-0.02em' }}>
-              Portfolio
-            </span>
-            <span className="block text-[8vw] md:text-[4.5vw] lg:text-[3.8vw] font-light italic text-white/60 -mt-[1vw] md:-mt-[0.5vw]"
-              style={{ fontFamily: "'Playfair Display', Georgia, serif" }}>
-              selected works
-            </span>
+        {/* Hero text content */}
+        <div
+          style={{
+            position: 'relative',
+            zIndex: 10,
+            textAlign: 'center',
+            paddingTop: '120px',
+            paddingBottom: '60px',
+            paddingLeft: '24px',
+            paddingRight: '24px',
+          }}
+        >
+          <h1
+            className="fade-up"
+            style={{
+              fontSize: 'clamp(44px, 6vw, 72px)',
+              fontWeight: 300,
+              letterSpacing: '-0.06em',
+              lineHeight: 1.05,
+              color: '#fff',
+              marginBottom: '32px',
+            }}
+          >
+            Design that<br />makes it real
           </h1>
-          <p className="fade-up fade-up-d1 mt-4 text-sm md:text-base text-white/30 tracking-wide max-w-md">
-            A curated collection of recent projects
+          <p
+            className="fade-up fade-up-d1"
+            style={{
+              fontSize: '15px',
+              fontWeight: 400,
+              color: 'rgba(255,255,255,0.65)',
+              marginBottom: '36px',
+              letterSpacing: '-0.01em',
+            }}
+          >
+            Crafting premium digital experiences.
           </p>
+          <div className="fade-up fade-up-d2">
+            <a href="#work" className="btn-primary">
+              View Portfolio
+            </a>
+          </div>
         </div>
 
-        {/* ── Cards area (below heading) ── */}
-        <div className="relative z-10 flex-1 w-full flex items-center justify-center mt-8">
-
-          {/* Subtle arc track hint */}
-          <div className="absolute w-[840px] h-[240px] bottom-[10%] border-t border-white/[0.03] rounded-t-[50%] pointer-events-none" />
-
+        {/* Angled carousel */}
+        <div
+          style={{
+            position: 'relative',
+            zIndex: 10,
+            width: '100%',
+            height: '320px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            marginTop: '16px',
+          }}
+        >
           {projects.map((project, index) => (
             <div
               key={project.id}
-              ref={el => { cardsRef.current[index] = el; }}
-              className="ferris-card absolute cursor-pointer rounded-lg overflow-hidden"
-              onClick={() => goTo(index)}
+              ref={el => { heroCardsRef.current[index] = el; }}
+              className="hero-card"
+              onClick={() => goToHero(index)}
               style={{
-                width: 'min(42vw, 360px)',
-                aspectRatio: '16/9',
+                width: 'min(48vw, 520px)',
+                aspectRatio: '16/10',
               }}
             >
               <img
                 src={project.image}
                 alt={project.title}
-                className="w-full h-full object-cover"
+                style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
                 loading={index < 3 ? 'eager' : 'lazy'}
               />
-
-              {/* Gradient overlay */}
-              <div className="absolute inset-0 rounded-lg"
+              {/* Dark overlay (controlled by GSAP) */}
+              <div
+                className="card-overlay"
                 style={{
-                  background: `linear-gradient(to top,
-                    ${project.color}55 0%,
-                    rgba(0,0,0,0.5) 40%,
-                    rgba(0,0,0,0.1) 60%,
-                    transparent 100%
-                  )`,
+                  position: 'absolute',
+                  inset: 0,
+                  background: '#000',
+                  opacity: 0,
+                  borderRadius: '12px',
                 }}
               />
-
-              {/* Card content */}
-              <div className="absolute bottom-0 left-0 right-0 p-5 md:p-6">
-                <span className="text-xs font-light italic text-white/50"
-                  style={{ fontFamily: "'Playfair Display', Georgia, serif" }}>
+              {/* Text overlay */}
+              <div
+                style={{
+                  position: 'absolute',
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  padding: '20px 24px',
+                  background: 'linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 100%)',
+                  borderRadius: '0 0 12px 12px',
+                }}
+              >
+                <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: '4px' }}>
                   {project.category}
-                </span>
-                <h2 className="mt-1 text-lg md:text-xl font-bold tracking-tight uppercase leading-tight"
-                  style={{ color: project.color }}>
+                </p>
+                <h3 style={{ fontSize: '18px', fontWeight: 500, color: '#fff', letterSpacing: '-0.02em' }}>
                   {project.title}
-                </h2>
+                </h3>
               </div>
-
-              {/* Border glow on active */}
-              <div className="absolute inset-0 rounded-lg pointer-events-none"
-                style={{ boxShadow: `0 0 40px ${project.color}15, 0 15px 40px rgba(0,0,0,0.5)` }}
-              />
             </div>
           ))}
-
-          {/* ── Left arrow ── */}
-          <button onClick={prev} disabled={isAnimating}
-            className="nav-arrow absolute left-4 md:left-10 z-30
-                       w-12 h-12 md:w-14 md:h-14 rounded-full bg-white/5 border border-white/10
-                       flex items-center justify-center text-white/50 hover:text-white hover:bg-white/10
-                       backdrop-blur-sm transition-all">
-            <ChevronLeft size={22} />
-          </button>
-
-          {/* ── Right arrow ── */}
-          <button onClick={next} disabled={isAnimating}
-            className="nav-arrow absolute right-4 md:right-10 z-30
-                       w-12 h-12 md:w-14 md:h-14 rounded-full bg-white/5 border border-white/10
-                       flex items-center justify-center text-white/50 hover:text-white hover:bg-white/10
-                       backdrop-blur-sm transition-all">
-            <ChevronRight size={22} />
-          </button>
         </div>
 
-        {/* ── Dots indicator ── */}
-        <div className="relative z-20 flex items-center gap-3 flex-shrink-0">
+        {/* Dot pagination */}
+        <div
+          style={{
+            position: 'relative',
+            zIndex: 10,
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            marginTop: '28px',
+            marginBottom: '40px',
+          }}
+        >
           {projects.map((_, i) => (
-            <button key={i} onClick={() => goTo(i)} disabled={isAnimating}
-              className={`rounded-full transition-all duration-500
-                ${i === currentIndex
-                  ? 'w-3 h-3 bg-white/70'
-                  : 'w-2 h-2 bg-white/20 hover:bg-white/30'}`}
+            <button
+              key={i}
+              onClick={() => goToHero(i)}
+              className={`dot-pill ${i === heroIndex ? 'active' : 'inactive'}`}
+              style={{ height: '5px', border: 'none', cursor: 'pointer', padding: 0 }}
+              aria-label={`Go to slide ${i + 1}`}
             />
           ))}
         </div>
       </section>
 
-      {/* ═══ STATS ═══ */}
-      <section ref={statsRef} className="py-16 border-y border-white/[0.06] bg-[#050505]">
-        <div className="max-w-5xl mx-auto px-8 flex flex-col md:flex-row items-center justify-center gap-16 text-center">
-          {[
-            { num: 48, suffix: '+', label: 'Projects Delivered' },
-            { num: 12, suffix: '', label: 'Awards Won' },
-            { num: 7, suffix: '+', label: 'Years Experience' },
-          ].map((s, i) => (
-            <div key={i} className="stat-item">
-              <div className="stat-number text-4xl font-light tracking-tight text-white/85"
-                data-target={s.num} data-suffix={s.suffix}>
-                0
+      {/* ═══════════════════════════════════════════
+          STATS
+      ═══════════════════════════════════════════ */}
+      <section
+        ref={statsRef}
+        style={{ background: '#000', padding: '80px 56px', borderTop: '1px solid rgba(255,255,255,0.07)' }}
+      >
+        <div style={{ maxWidth: '960px', margin: '0 auto' }}>
+          <p
+            style={{
+              fontSize: '14.9px',
+              color: '#ddd',
+              textAlign: 'center',
+              marginBottom: '64px',
+              letterSpacing: '-0.01em',
+            }}
+          >
+            Trusted by clients who believe in exceptional digital craft.
+          </p>
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'row' as const,
+              flexWrap: 'wrap' as const,
+              justifyContent: 'center',
+              gap: '64px',
+              textAlign: 'center',
+            }}
+          >
+            {[
+              { num: 48, suffix: '+', label: 'Projects Delivered' },
+              { num: 12, suffix: '', label: 'Awards Won' },
+              { num: 7, suffix: '+', label: 'Years Experience' },
+            ].map((stat, i) => (
+              <div key={i} className="stat-item">
+                <div
+                  className="stat-number"
+                  data-target={stat.num}
+                  data-suffix={stat.suffix}
+                  style={{
+                    fontSize: 'clamp(48px, 5vw, 72px)',
+                    fontWeight: 300,
+                    letterSpacing: '-0.06em',
+                    color: '#fff',
+                    lineHeight: 1,
+                  }}
+                >
+                  0
+                </div>
+                <div
+                  style={{
+                    marginTop: '10px',
+                    fontSize: '11.8px',
+                    fontWeight: 400,
+                    color: 'rgba(255,255,255,0.4)',
+                    letterSpacing: '0.08em',
+                    textTransform: 'uppercase',
+                  }}
+                >
+                  {stat.label}
+                </div>
               </div>
-              <div className="mt-2 text-[11px] tracking-[0.16em] uppercase text-white/30">{s.label}</div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </section>
 
-      {/* ═══ MARQUEE ═══ */}
-      <div className="overflow-hidden whitespace-nowrap py-10 border-b border-white/[0.06]">
-        <div className="flex">
-          {[0, 1].map(i => (
-            <div key={i} className="animate-marquee inline-block text-3xl md:text-4xl font-light tracking-tight uppercase text-white/8 px-4"
-              aria-hidden={i > 0}>
-              Design &bull; Development &bull; Strategy &bull; Branding &bull; E-commerce &bull; Architecture &bull;&nbsp;
-            </div>
-          ))}
-        </div>
-      </div>
+      {/* ═══════════════════════════════════════════
+          SELECTED WORKS
+      ═══════════════════════════════════════════ */}
+      <section
+        ref={worksRef}
+        id="work"
+        style={{ background: '#fff', padding: '100px 56px', color: '#000' }}
+      >
+        <div style={{ maxWidth: '1120px', margin: '0 auto' }}>
 
-      {/* ═══ SELECTED WORKS GRID ═══ */}
-      <section ref={worksRef} id="work" className="py-28 md:py-36 px-8 md:px-14">
-        <div className="max-w-6xl mx-auto">
-          <div className="works-heading mb-20 md:flex md:justify-between md:items-end">
-            <div>
-              <span className="text-[11px] tracking-[0.2em] uppercase text-white/30">Portfolio</span>
-              <h2 className="mt-4 text-4xl md:text-5xl font-light tracking-[-0.03em] text-white/85" style={{ fontFamily: "'Playfair Display', Georgia, serif" }}>Selected Works</h2>
-            </div>
-            <p className="mt-6 md:mt-0 text-base text-white/30 max-w-sm leading-relaxed">
-              A curated collection of recent projects spanning hospitality, education, technology, and beyond.
+          {/* Header */}
+          <div className="works-header" style={{ marginBottom: '48px' }}>
+            <h2
+              style={{
+                fontSize: 'clamp(36px, 4vw, 50px)',
+                fontWeight: 400,
+                letterSpacing: '-0.04em',
+                color: '#000',
+                marginBottom: '10px',
+                lineHeight: 1.1,
+              }}
+            >
+              Selected works
+            </h2>
+            <p style={{ fontSize: '14.6px', color: 'rgba(0,0,0,0.45)', letterSpacing: '-0.01em' }}>
+              A curated collection of recent projects.
             </p>
           </div>
-          <div className="works-grid grid md:grid-cols-2 gap-6">
-            {projects.slice(0, 4).map((project) => (
-              <div key={project.id} className="work-card group cursor-pointer img-wrap">
-                <div className="aspect-[16/9] overflow-hidden bg-[#0a0a0a] rounded-lg">
-                  <img src={project.image} alt={project.title}
-                    className="w-full h-full object-cover opacity-70 group-hover:opacity-100 img-scale" />
-                </div>
-                <div className="mt-5 space-y-1">
-                  <span className="text-[10px] tracking-[0.16em] uppercase text-white/25">{project.subtitle}</span>
-                  <h3 className="text-xl font-medium tracking-tight text-white/75 group-hover:text-white transition-colors">{project.title}</h3>
+
+          {/* Category tabs */}
+          <div
+            style={{
+              display: 'flex',
+              flexWrap: 'wrap' as const,
+              gap: '8px',
+              marginBottom: '48px',
+              overflowX: 'auto',
+            }}
+          >
+            {categories.map(cat => (
+              <button
+                key={cat}
+                onClick={() => setActiveCategory(cat)}
+                className={`cat-pill ${activeCategory === cat ? 'active' : ''}`}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
+
+          {/* Works grid */}
+          <div className="works-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 480px), 1fr))', gap: '24px' }}>
+            {filteredProjects.map(project => (
+              <div
+                key={project.id}
+                className="work-card img-wrap"
+                style={{
+                  borderRadius: '12px',
+                  overflow: 'hidden',
+                  background: '#111',
+                  cursor: 'pointer',
+                  position: 'relative',
+                  aspectRatio: '16/10',
+                }}
+              >
+                <img
+                  src={project.image}
+                  alt={project.title}
+                  className="img-scale"
+                  style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                  loading="lazy"
+                />
+                {/* Text overlay at bottom left */}
+                <div
+                  style={{
+                    position: 'absolute',
+                    inset: 0,
+                    background: 'linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.15) 50%, transparent 100%)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'flex-end',
+                    padding: '28px 32px',
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between' }}>
+                    <div>
+                      <h3
+                        style={{
+                          fontSize: 'clamp(22px, 2.5vw, 33px)',
+                          fontWeight: 400,
+                          color: '#fff',
+                          letterSpacing: '-0.03em',
+                          lineHeight: 1.1,
+                          marginBottom: '6px',
+                        }}
+                      >
+                        {project.title}
+                      </h3>
+                      <p style={{ fontSize: '14.6px', color: 'rgba(255,255,255,0.65)', letterSpacing: '-0.01em' }}>
+                        {project.description}
+                      </p>
+                    </div>
+                    <span
+                      className="work-card-arrow"
+                      style={{ fontSize: '24px', color: '#fff', marginLeft: '16px', flexShrink: 0 }}
+                    >
+                      →
+                    </span>
+                  </div>
                 </div>
               </div>
             ))}
@@ -439,106 +914,426 @@ function App() {
         </div>
       </section>
 
-      {/* ═══ ABOUT — right side flowing description text ═══ */}
-      <section ref={aboutRef} id="about" className="relative py-28 md:py-36 px-8 md:px-14 border-t border-white/[0.06] overflow-hidden">
-        <div className="relative z-10 max-w-6xl mx-auto grid lg:grid-cols-2 gap-20">
-          <div className="about-left">
-            <span className="text-[11px] tracking-[0.2em] uppercase text-white/30">Studio</span>
-            <h2 className="mt-4 text-4xl md:text-5xl font-light tracking-[-0.03em] text-white/85 leading-tight" style={{ fontFamily: "'Playfair Display', Georgia, serif" }}>
-              Design that<br />moves people
+      {/* ═══════════════════════════════════════════
+          SERVICES
+      ═══════════════════════════════════════════ */}
+      <section
+        ref={servicesRef}
+        id="services"
+        style={{ background: '#fff', padding: '100px 0 80px', color: '#000', borderTop: '1px solid rgba(0,0,0,0.06)' }}
+      >
+        <div style={{ maxWidth: '1120px', margin: '0 auto', padding: '0 56px' }}>
+          {/* Header row */}
+          <div
+            className="services-header"
+            style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 1fr',
+              gap: '48px',
+              alignItems: 'start',
+              marginBottom: '56px',
+            }}
+          >
+            <h2
+              style={{
+                fontSize: 'clamp(32px, 3.5vw, 50px)',
+                fontWeight: 400,
+                letterSpacing: '-0.04em',
+                color: '#000',
+                lineHeight: 1.1,
+              }}
+            >
+              Everything you need<br />in one studio
             </h2>
-            <div className="mt-12 flex gap-8">
-              {['Concept', 'Design', 'Develop', 'Launch'].map((step, i) => (
-                <div key={step} className="about-step">
-                  <div className="text-[10px] text-white/15 mb-2">{String(i + 1).padStart(2, '0')}</div>
-                  <div className="text-sm font-medium text-white/40 tracking-tight">{step}</div>
-                </div>
-              ))}
-            </div>
+            <p
+              style={{
+                fontSize: '14.6px',
+                color: 'rgba(0,0,0,0.5)',
+                letterSpacing: '-0.01em',
+                lineHeight: 1.65,
+                paddingTop: '8px',
+              }}
+            >
+              From brand strategy to live website, we handle every layer of your digital presence. One team, one vision, one seamless process.
+            </p>
           </div>
+        </div>
 
-          <div className="about-right relative h-[360px] md:h-[420px] overflow-hidden"
-            style={{ maskImage: 'linear-gradient(to bottom, transparent 0%, black 12%, black 88%, transparent 100%)' }}>
-            <div className="vertical-flow-text">
-              {[0, 1].map((copy) => (
-                <div key={copy} className="space-y-8 pb-8">
-                  <p className="text-lg text-white/35 leading-relaxed">
-                    Crafting premium digital experiences where every element serves a purpose and every interaction feels intentional.
-                  </p>
-                  <p className="text-base text-white/25 leading-relaxed">
-                    From concept to launch, we partner with forward-thinking brands to create websites that are as functional as they are beautiful.
-                  </p>
-                  <p className="text-base text-white/25 leading-relaxed">
-                    We believe great design is invisible — it guides without dictating, communicates without noise, and creates space for content to breathe.
-                  </p>
-                  <p className="text-base text-white/25 leading-relaxed">
-                    Every pixel is placed with intent. Every animation timed to feel natural. We obsess over the details most people never notice — because those details are what separate good from unforgettable.
-                  </p>
-                  <p className="text-base text-white/25 leading-relaxed">
-                    Our process starts with listening. Understanding your audience, your goals, and the story you need to tell. Then we distill that into a visual language that speaks louder than words.
-                  </p>
-                  <p className="text-base text-white/25 leading-relaxed">
-                    Performance is not an afterthought. We build fast, accessible, and responsive — because the best design in the world means nothing if nobody waits for it to load.
-                  </p>
-                  <p className="text-base text-white/25 leading-relaxed">
-                    We treat every project as a collaboration, not a transaction. Your ambition drives the work. Our craft shapes the execution.
-                  </p>
-                  <div className="h-px w-full bg-white/[0.06]" />
+        {/* Horizontal scroll cards */}
+        <div
+          className="services-scroll"
+          style={{ display: 'flex', gap: '16px', padding: '0 56px', paddingRight: '40px' }}
+        >
+          {services.map((service, i) => (
+            <div
+              key={i}
+              className="service-scroll-card"
+              style={{
+                width: '430px',
+                height: '583px',
+                borderRadius: '12px',
+                background: '#2f2f2f',
+                overflow: 'hidden',
+                position: 'relative',
+                flexShrink: 0,
+              }}
+            >
+              <img
+                src={service.image}
+                alt={service.title}
+                style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', opacity: 0.55 }}
+                loading="lazy"
+              />
+              <div
+                style={{
+                  position: 'absolute',
+                  inset: 0,
+                  background: 'linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.2) 60%, transparent 100%)',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'flex-end',
+                  padding: '32px',
+                }}
+              >
+                <h3
+                  style={{
+                    fontSize: '24px',
+                    fontWeight: 500,
+                    color: '#fff',
+                    letterSpacing: '-0.02em',
+                    marginBottom: '10px',
+                  }}
+                >
+                  {service.title}
+                </h3>
+                <p style={{ fontSize: '11.8px', color: 'rgba(255,255,255,0.65)', lineHeight: 1.6, marginBottom: '20px' }}>
+                  {service.description}
+                </p>
+                <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                  <span style={{ fontSize: '20px', color: 'rgba(255,255,255,0.6)' }}>→</span>
                 </div>
-              ))}
+              </div>
             </div>
-          </div>
+          ))}
+        </div>
+
+        {/* Dot pagination for services */}
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '8px',
+            marginTop: '36px',
+          }}
+        >
+          {services.map((_, i) => (
+            <button
+              key={i}
+              onClick={() => setServicesPage(i)}
+              className={`dot-pill ${i === servicesPage ? 'active' : 'inactive'}`}
+              style={{ height: '5px', border: 'none', cursor: 'pointer', padding: 0, background: i === servicesPage ? 'rgba(0,0,0,0.7)' : 'rgba(0,0,0,0.2)' }}
+              aria-label={`Service page ${i + 1}`}
+            />
+          ))}
         </div>
       </section>
 
-      {/* ═══ SERVICES ═══ */}
-      <section ref={servicesRef} id="services" className="py-28 md:py-36 px-8 md:px-14 border-t border-white/[0.06]">
-        <div className="max-w-6xl mx-auto">
-          <div className="services-heading text-center mb-20">
-            <span className="text-[11px] tracking-[0.2em] uppercase text-white/30">Services</span>
-            <h2 className="mt-4 text-4xl md:text-5xl font-light tracking-[-0.03em] text-white/85" style={{ fontFamily: "'Playfair Display', Georgia, serif" }}>What we do</h2>
+      {/* ═══════════════════════════════════════════
+          TRUST BANNER
+      ═══════════════════════════════════════════ */}
+      <section
+        ref={trustRef}
+        style={{
+          background: '#000',
+          padding: '100px 56px',
+          textAlign: 'center',
+          borderTop: '1px solid rgba(255,255,255,0.06)',
+        }}
+      >
+        {/* Avatar row */}
+        <div
+          className="trust-item"
+          style={{ display: 'flex', justifyContent: 'center', marginBottom: '36px' }}
+        >
+          {avatarColors.map((color, i) => (
+            <div
+              key={i}
+              style={{
+                width: '48px',
+                height: '48px',
+                borderRadius: '50%',
+                background: color,
+                border: '2px solid #000',
+                marginLeft: i === 0 ? 0 : '-12px',
+                position: 'relative',
+                zIndex: 5 - i,
+              }}
+            />
+          ))}
+        </div>
+        <h2
+          className="trust-item"
+          style={{
+            fontSize: 'clamp(28px, 3.5vw, 42px)',
+            fontWeight: 500,
+            color: '#fff',
+            letterSpacing: '-0.04em',
+            lineHeight: 1.15,
+            maxWidth: '640px',
+            margin: '0 auto',
+          }}
+        >
+          Trusted by forward-thinking brands worldwide
+        </h2>
+      </section>
+
+      {/* ═══════════════════════════════════════════
+          FAQ
+      ═══════════════════════════════════════════ */}
+      <section
+        ref={faqRef}
+        id="about"
+        style={{
+          background: '#000',
+          padding: '100px 56px',
+          borderTop: '1px solid rgba(255,255,255,0.08)',
+        }}
+      >
+        <div style={{ maxWidth: '860px', margin: '0 auto' }}>
+          <div className="faq-header" style={{ marginBottom: '56px' }}>
+            <h2
+              style={{
+                fontSize: 'clamp(32px, 3.5vw, 50px)',
+                fontWeight: 400,
+                letterSpacing: '-0.04em',
+                color: '#fff',
+                lineHeight: 1.1,
+              }}
+            >
+              Common questions
+            </h2>
           </div>
-          <div className="services-grid grid md:grid-cols-2 lg:grid-cols-4 gap-px bg-white/[0.04]">
-            {[
-              { title: 'Web Design', desc: 'Pixel-perfect interfaces crafted for conversion and delight.' },
-              { title: 'Development', desc: 'Clean, performant code that brings designs to life.' },
-              { title: 'Brand Identity', desc: 'Visual systems that communicate with clarity.' },
-              { title: 'Motion Design', desc: 'Subtle animations that elevate the experience.' },
-            ].map((s, i) => (
-              <div key={i} className="service-card bg-black p-10 hover:bg-white/[0.02] transition-colors duration-500 group">
-                <div className="text-xs text-white/15 mb-8 group-hover:text-white/30 transition-colors">{String(i + 1).padStart(2, '0')}</div>
-                <h3 className="text-lg font-medium text-white/75 tracking-tight">{s.title}</h3>
-                <p className="mt-4 text-sm text-white/25 leading-relaxed">{s.desc}</p>
-                <div className="mt-6 w-0 h-px bg-white/20 group-hover:w-full transition-all duration-700" />
-              </div>
+          <div style={{ borderTop: '1px solid rgba(255,255,255,0.08)' }}>
+            {faqs.map((faq, i) => (
+              <FaqItem key={i} question={faq.question} answer={faq.answer} index={i} />
             ))}
           </div>
         </div>
       </section>
 
-      {/* ═══ CTA ═══ */}
-      <section ref={ctaRef} id="contact" className="py-32 lg:py-44 px-6 border-t border-white/[0.06] text-center overflow-hidden">
-        <div className="max-w-3xl mx-auto space-y-8">
-          <h2 className="text-5xl md:text-7xl font-light tracking-[-0.04em] text-white/85 leading-[1.05]" style={{ fontFamily: "'Playfair Display', Georgia, serif" }}>
-            Ready to stand out?
+      {/* ═══════════════════════════════════════════
+          CTA — Particle Globe
+      ═══════════════════════════════════════════ */}
+      <section
+        ref={ctaRef}
+        id="contact"
+        style={{
+          position: 'relative',
+          background: '#000',
+          padding: '120px 56px',
+          textAlign: 'center',
+          overflow: 'hidden',
+          borderTop: '1px solid rgba(255,255,255,0.08)',
+          borderBottom: '1px solid rgba(255,255,255,0.25)',
+        }}
+      >
+        <GlobeCanvas />
+        <div style={{ position: 'relative', zIndex: 10 }}>
+          <h2
+            className="cta-anim"
+            style={{
+              fontSize: 'clamp(42px, 6vw, 72px)',
+              fontWeight: 300,
+              letterSpacing: '-0.041em',
+              color: '#fff',
+              lineHeight: 1.05,
+              marginBottom: '24px',
+            }}
+          >
+            Start your project<br />today
           </h2>
-          <p className="text-lg text-white/30 max-w-xl mx-auto leading-relaxed">
-            Get started today and build a digital experience that leaves a lasting impression.
+          <p
+            className="cta-anim"
+            style={{
+              fontSize: '15px',
+              fontWeight: 500,
+              color: 'rgba(255,255,255,0.55)',
+              marginBottom: '44px',
+              letterSpacing: '-0.01em',
+            }}
+          >
+            No commitment required. Let&rsquo;s explore the possibilities.
           </p>
-          <div className="pt-4 cta-btn">
-            <a href="#"
-              className="magnetic-btn inline-block px-10 py-5 bg-white text-black text-sm font-semibold tracking-[0.08em] uppercase hover:bg-white/90 transition-colors rounded-sm">
-              Start Your Project
+          <div className="cta-anim">
+            <a href="mailto:hello@harrychan.co" className="btn-primary">
+              Get Started
             </a>
           </div>
         </div>
       </section>
 
-      {/* ═══ FOOTER ═══ */}
-      <footer className="py-14 px-8 md:px-14 border-t border-white/[0.06]">
-        <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
-          <span className="text-sm font-semibold tracking-[0.08em] text-white/50">HARRY CHAN</span>
-          <span className="text-xs tracking-wide text-white/20">&copy; 2026 All rights reserved.</span>
+      {/* ═══════════════════════════════════════════
+          FOOTER
+      ═══════════════════════════════════════════ */}
+      <footer
+        style={{
+          background: '#000',
+          padding: '80px 56px 48px',
+          borderTop: '1px solid rgba(255,255,255,0.06)',
+        }}
+      >
+        <div
+          style={{
+            maxWidth: '1120px',
+            margin: '0 auto',
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))',
+            gap: '48px',
+            marginBottom: '64px',
+          }}
+        >
+          {/* Brand */}
+          <div>
+            <p
+              style={{
+                fontSize: '13px',
+                fontWeight: 600,
+                letterSpacing: '0.1em',
+                color: '#fff',
+                marginBottom: '16px',
+              }}
+            >
+              HARRY CHAN
+            </p>
+            <p style={{ fontSize: '14.6px', color: 'rgba(255,255,255,0.4)', lineHeight: 1.7, maxWidth: '200px' }}>
+              Crafting premium digital experiences that make it real.
+            </p>
+          </div>
+
+          {/* Work */}
+          <div>
+            <p
+              style={{
+                fontSize: '11.8px',
+                fontWeight: 400,
+                color: 'rgba(255,255,255,0.4)',
+                letterSpacing: '0.1em',
+                textTransform: 'uppercase',
+                marginBottom: '20px',
+              }}
+            >
+              Work
+            </p>
+            {['Portfolio', 'Case Studies', 'Process', 'Results'].map(link => (
+              <a
+                key={link}
+                href="#"
+                style={{
+                  display: 'block',
+                  fontSize: '14.6px',
+                  color: 'rgba(255,255,255,0.6)',
+                  textDecoration: 'none',
+                  lineHeight: 2,
+                  transition: 'color 0.2s ease',
+                }}
+                onMouseEnter={e => (e.currentTarget.style.color = '#fff')}
+                onMouseLeave={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.6)')}
+              >
+                {link}
+              </a>
+            ))}
+          </div>
+
+          {/* Services */}
+          <div>
+            <p
+              style={{
+                fontSize: '11.8px',
+                fontWeight: 400,
+                color: 'rgba(255,255,255,0.4)',
+                letterSpacing: '0.1em',
+                textTransform: 'uppercase',
+                marginBottom: '20px',
+              }}
+            >
+              Services
+            </p>
+            {['Web Design', 'Development', 'Brand Identity', 'Motion Design'].map(link => (
+              <a
+                key={link}
+                href="#services"
+                style={{
+                  display: 'block',
+                  fontSize: '14.6px',
+                  color: 'rgba(255,255,255,0.6)',
+                  textDecoration: 'none',
+                  lineHeight: 2,
+                  transition: 'color 0.2s ease',
+                }}
+                onMouseEnter={e => (e.currentTarget.style.color = '#fff')}
+                onMouseLeave={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.6)')}
+              >
+                {link}
+              </a>
+            ))}
+          </div>
+
+          {/* Connect */}
+          <div>
+            <p
+              style={{
+                fontSize: '11.8px',
+                fontWeight: 400,
+                color: 'rgba(255,255,255,0.4)',
+                letterSpacing: '0.1em',
+                textTransform: 'uppercase',
+                marginBottom: '20px',
+              }}
+            >
+              Connect
+            </p>
+            {['Email', 'LinkedIn', 'Dribbble', 'Instagram'].map(link => (
+              <a
+                key={link}
+                href="#"
+                style={{
+                  display: 'block',
+                  fontSize: '14.6px',
+                  color: 'rgba(255,255,255,0.6)',
+                  textDecoration: 'none',
+                  lineHeight: 2,
+                  transition: 'color 0.2s ease',
+                }}
+                onMouseEnter={e => (e.currentTarget.style.color = '#fff')}
+                onMouseLeave={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.6)')}
+              >
+                {link}
+              </a>
+            ))}
+          </div>
+        </div>
+
+        {/* Bottom copyright */}
+        <div
+          style={{
+            maxWidth: '1120px',
+            margin: '0 auto',
+            paddingTop: '24px',
+            borderTop: '1px solid rgba(255,255,255,0.06)',
+            display: 'flex',
+            flexDirection: 'row' as const,
+            flexWrap: 'wrap' as const,
+            justifyContent: 'space-between',
+            gap: '12px',
+          }}
+        >
+          <span style={{ fontSize: '13px', color: 'rgba(255,255,255,0.3)' }}>
+            &copy; 2026 Harry Chan. All rights reserved.
+          </span>
+          <span style={{ fontSize: '13px', color: 'rgba(255,255,255,0.3)' }}>
+            Made with care in Hong Kong.
+          </span>
         </div>
       </footer>
     </div>
