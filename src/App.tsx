@@ -244,8 +244,10 @@ function App() {
 
   const navRef = useRef<HTMLElement>(null);
   const heroCardsRef = useRef<(HTMLDivElement | null)[]>([]);
-  const videoSectionRef = useRef<HTMLElement>(null);
-  const videoRef = useRef<HTMLVideoElement>(null);
+  const frameSectionRef = useRef<HTMLElement>(null);
+  const frameCanvasRef = useRef<HTMLCanvasElement>(null);
+  const framesRef = useRef<HTMLImageElement[]>([]);
+  const frameIndexRef = useRef(0);
   const statsRef = useRef<HTMLElement>(null);
   const worksRef = useRef<HTMLElement>(null);
   const servicesRef = useRef<HTMLElement>(null);
@@ -362,36 +364,106 @@ function App() {
     return () => window.removeEventListener('keydown', onKey);
   }, [heroNext, heroPrev]);
 
-  /* ─── Scroll-driven video playback ─── */
+  /* ─── Scroll-driven frame sequence ─── */
   useEffect(() => {
-    const video = videoRef.current;
-    const section = videoSectionRef.current;
-    if (!video || !section) return;
+    const FRAME_COUNT = 145;
+    const canvas = frameCanvasRef.current;
+    const section = frameSectionRef.current;
+    if (!canvas || !section) return;
 
-    // Wait for video metadata to load
-    const setup = () => {
-      const duration = video.duration;
-      if (!duration || isNaN(duration)) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
 
-      ScrollTrigger.create({
-        trigger: section,
-        start: 'top top',
-        end: 'bottom bottom',
-        scrub: 0.5,
-        onUpdate: (self) => {
-          video.currentTime = self.progress * duration;
-        },
-      });
+    let pendingFrame: number | null = null;
+    let rafId = 0;
+
+    // Size canvas to fill viewport (retina-aware)
+    const sizeCanvas = () => {
+      const dpr = window.devicePixelRatio || 1;
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+      canvas.width = w * dpr;
+      canvas.height = h * dpr;
+      canvas.style.width = w + 'px';
+      canvas.style.height = h + 'px';
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      // Redraw current frame after resize
+      drawFrame(frameIndexRef.current);
     };
 
-    if (video.readyState >= 1) {
-      setup();
-    } else {
-      video.addEventListener('loadedmetadata', setup, { once: true });
+    // Draw image with "cover" behaviour
+    const drawFrame = (index: number) => {
+      const img = images[index];
+      if (!img || !img.complete || img.naturalWidth === 0) return;
+
+      const cw = window.innerWidth;
+      const ch = window.innerHeight;
+      const iw = img.naturalWidth;
+      const ih = img.naturalHeight;
+
+      // Cover calc
+      const scale = Math.max(cw / iw, ch / ih);
+      const dw = iw * scale;
+      const dh = ih * scale;
+      const dx = (cw - dw) / 2;
+      const dy = (ch - dh) / 2;
+
+      ctx.clearRect(0, 0, cw, ch);
+      ctx.drawImage(img, dx, dy, dw, dh);
+      frameIndexRef.current = index;
+    };
+
+    // Preload all frames
+    const images: HTMLImageElement[] = [];
+    let loadedCount = 0;
+
+    for (let i = 0; i < FRAME_COUNT; i++) {
+      const img = new Image();
+      const padded = String(i).padStart(4, '0');
+      img.src = `/frames/${padded}.jpg`;
+      img.onload = () => {
+        loadedCount++;
+        if (loadedCount === 1) {
+          sizeCanvas();
+          drawFrame(0);
+        }
+      };
+      images[i] = img;
     }
+    framesRef.current = images;
+
+    // Use rAF to batch scroll updates for smoothness
+    const scheduleFrame = (index: number) => {
+      pendingFrame = index;
+      if (!rafId) {
+        rafId = requestAnimationFrame(() => {
+          if (pendingFrame !== null && pendingFrame !== frameIndexRef.current) {
+            drawFrame(pendingFrame);
+          }
+          rafId = 0;
+          pendingFrame = null;
+        });
+      }
+    };
+
+    // ScrollTrigger to scrub through frames
+    const st = ScrollTrigger.create({
+      trigger: section,
+      start: 'top top',
+      end: 'bottom bottom',
+      scrub: true,
+      onUpdate: (self) => {
+        const index = Math.min(FRAME_COUNT - 1, Math.floor(self.progress * (FRAME_COUNT - 1)));
+        scheduleFrame(index);
+      },
+    });
+
+    window.addEventListener('resize', sizeCanvas);
 
     return () => {
-      video.removeEventListener('loadedmetadata', setup);
+      st.kill();
+      cancelAnimationFrame(rafId);
+      window.removeEventListener('resize', sizeCanvas);
     };
   }, []);
 
@@ -795,10 +867,10 @@ function App() {
       </section>
 
       {/* ═══════════════════════════════════════════
-          SCROLL VIDEO
+          SCROLL FRAME SEQUENCE
       ═══════════════════════════════════════════ */}
       <section
-        ref={videoSectionRef}
+        ref={frameSectionRef}
         style={{ position: 'relative', height: '400vh', background: '#000' }}
       >
         <div
@@ -813,20 +885,16 @@ function App() {
             justifyContent: 'center',
           }}
         >
-          <video
-            ref={videoRef}
-            muted
-            playsInline
-            preload="auto"
+          <canvas
+            ref={frameCanvasRef}
             style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
               width: '100%',
               height: '100%',
-              objectFit: 'cover',
             }}
-          >
-            <source src="/hero-video.webm" type="video/webm" />
-            <source src="/hero-video.mp4" type="video/mp4" />
-          </video>
+          />
           {/* Subtle vignette overlay */}
           <div
             style={{
