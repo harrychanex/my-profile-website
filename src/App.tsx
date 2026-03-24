@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { Menu, X, Plus, Minus } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Menu, X, Plus, Minus } from 'lucide-react';
 import './App.css';
 
 gsap.registerPlugin(ScrollTrigger);
@@ -250,7 +250,6 @@ function App() {
   const trustRef = useRef<HTMLElement>(null);
   const faqRef = useRef<HTMLElement>(null);
   const ctaRef = useRef<HTMLElement>(null);
-  const autoTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isAnimatingRef = useRef(false);
 
   /* ─── Navbar scroll ─── */
@@ -260,7 +259,7 @@ function App() {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  /* ─── Hero carousel helpers ─── */
+  /* ─── Hero carousel helpers — semicircular arc ─── */
   const getCardStyle = useCallback((index: number, active: number) => {
     const total = projects.length;
     let diff = index - active;
@@ -268,19 +267,25 @@ function App() {
     if (diff < -total / 2) diff += total;
 
     const absDiff = Math.abs(diff);
-    if (absDiff > 1) return null; // only show center and immediate neighbors
 
-    // Card geometry
-    const cardW = typeof window !== 'undefined' ? Math.min(window.innerWidth * 0.48, 520) : 480;
-    const gap = 24;
+    // Arc geometry — cards sit on a semicircle
+    const arcSpread = 48; // degrees between each card
+    const angleDeg = diff * arcSpread;
+    const angleRad = (angleDeg * Math.PI) / 180;
+    const radiusX = 440;
+    const radiusY = 100;
 
-    const x = diff * (cardW + gap);
-    const rotate = diff * -2; // -2deg left, +2deg right (opposite to diff direction)
-    const scale = absDiff === 0 ? 1 : 0.9;
-    const zIndex = absDiff === 0 ? 10 : 5;
-    const overlayOpacity = absDiff === 0 ? 0 : 0.4;
+    const x = Math.sin(angleRad) * radiusX;
+    const y = (1 - Math.cos(angleRad)) * radiusY; // 0 at center, rises on sides
 
-    return { x, rotate, scale, zIndex, overlayOpacity };
+    const scale = absDiff === 0 ? 1 : absDiff === 1 ? 0.82 : 0.65;
+    const opacity = absDiff <= 1 ? 1 : absDiff === 2 ? 0.4 : 0;
+    const blur = absDiff === 0 ? 0 : absDiff === 1 ? 2 : 5;
+    const brightness = absDiff === 0 ? 1 : 0.55;
+    const zIndex = 10 - absDiff;
+    const overlayOpacity = absDiff === 0 ? 0 : absDiff === 1 ? 0.35 : 0.6;
+
+    return { x, y, scale, opacity, blur, brightness, zIndex, overlayOpacity };
   }, []);
 
   const goToHero = useCallback((target: number) => {
@@ -291,79 +296,69 @@ function App() {
     isAnimatingRef.current = true;
     heroCardsRef.current.forEach((card, i) => {
       if (!card) return;
-      const style = getCardStyle(i, next);
-      if (style) {
-        gsap.to(card, {
-          x: style.x,
-          rotation: style.rotate,
-          scale: style.scale,
-          opacity: 1,
-          duration: 0.7,
-          ease: 'power3.inOut',
-          zIndex: style.zIndex,
-          onComplete: i === 0 ? () => {
-            isAnimatingRef.current = false;
-          } : undefined,
-        });
-        // Update the dark overlay
-        const overlay = card.querySelector<HTMLDivElement>('.card-overlay');
-        if (overlay) {
-          gsap.to(overlay, { opacity: style.overlayOpacity, duration: 0.5 });
-        }
-      } else {
-        gsap.to(card, { opacity: 0, duration: 0.3, zIndex: 0 });
+      const s = getCardStyle(i, next);
+      gsap.to(card, {
+        x: s.x,
+        y: s.y,
+        scale: s.scale,
+        opacity: s.opacity,
+        filter: `blur(${s.blur}px) brightness(${s.brightness})`,
+        zIndex: s.zIndex,
+        duration: 0.8,
+        ease: 'power3.inOut',
+        onComplete: i === 0 ? () => {
+          isAnimatingRef.current = false;
+        } : undefined,
+      });
+      const overlay = card.querySelector<HTMLDivElement>('.card-overlay');
+      if (overlay) {
+        gsap.to(overlay, { opacity: s.overlayOpacity, duration: 0.5 });
       }
     });
 
     setHeroIndex(next);
   }, [getCardStyle]);
 
+  const heroNext = useCallback(() => goToHero(heroIndex + 1), [heroIndex, goToHero]);
+  const heroPrev = useCallback(() => goToHero(heroIndex - 1), [heroIndex, goToHero]);
+
   /* ─── Set initial hero card positions ─── */
   useEffect(() => {
     heroCardsRef.current.forEach((card, i) => {
       if (!card) return;
-      const style = getCardStyle(i, 0);
-      if (style) {
-        gsap.set(card, {
-          x: style.x,
-          rotation: style.rotate,
-          scale: style.scale,
-          opacity: 0,
-          zIndex: style.zIndex,
-        });
-        const overlay = card.querySelector<HTMLDivElement>('.card-overlay');
-        if (overlay) gsap.set(overlay, { opacity: style.overlayOpacity });
-
-        gsap.to(card, {
-          opacity: 1,
-          y: 0,
-          duration: 1,
-          delay: 0.5 + i * 0.1,
-          ease: 'power2.out',
-        });
-      } else {
-        gsap.set(card, { opacity: 0, zIndex: 0 });
-      }
+      const s = getCardStyle(i, 0);
+      gsap.fromTo(card,
+        {
+          x: s.x, y: s.y + 50, scale: s.scale, opacity: 0,
+          filter: `blur(${s.blur}px) brightness(${s.brightness})`,
+          zIndex: s.zIndex,
+        },
+        {
+          x: s.x, y: s.y, opacity: s.opacity,
+          filter: `blur(${s.blur}px) brightness(${s.brightness})`,
+          duration: 1.1, delay: 0.4 + i * 0.08, ease: 'power2.out',
+        }
+      );
+      const overlay = card.querySelector<HTMLDivElement>('.card-overlay');
+      if (overlay) gsap.set(overlay, { opacity: s.overlayOpacity });
     });
   }, [getCardStyle]);
 
   /* ─── Hero auto-advance ─── */
   useEffect(() => {
-    const schedule = () => {
-      autoTimerRef.current = setTimeout(() => {
-        setHeroIndex(prev => {
-          const next = (prev + 1) % projects.length;
-          goToHero(next);
-          return prev; // state will be updated inside goToHero
-        });
-        schedule();
-      }, 5000);
+    const timer = setInterval(() => heroNext(), 5000);
+    return () => clearInterval(timer);
+  }, [heroNext]);
+
+  /* ─── Keyboard nav ─── */
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowRight') heroNext();
+      if (e.key === 'ArrowLeft') heroPrev();
     };
-    schedule();
-    return () => {
-      if (autoTimerRef.current) clearTimeout(autoTimerRef.current);
-    };
-  }, [goToHero]);
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [heroNext, heroPrev]);
 
   /* ─── ScrollTrigger animations ─── */
   useEffect(() => {
@@ -643,19 +638,32 @@ function App() {
           </div>
         </div>
 
-        {/* Angled carousel */}
+        {/* Arc carousel */}
         <div
           style={{
             position: 'relative',
             zIndex: 10,
             width: '100%',
-            height: '320px',
+            flex: '1 0 auto',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            marginTop: '16px',
+            minHeight: '340px',
           }}
         >
+          {/* Subtle arc track hint */}
+          <div style={{
+            position: 'absolute',
+            width: '880px',
+            height: '200px',
+            bottom: '8%',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            borderTop: '1px solid rgba(255,255,255,0.03)',
+            borderRadius: '50% 50% 0 0',
+            pointerEvents: 'none',
+          }} />
+
           {projects.map((project, index) => (
             <div
               key={project.id}
@@ -663,8 +671,8 @@ function App() {
               className="hero-card"
               onClick={() => goToHero(index)}
               style={{
-                width: 'min(48vw, 520px)',
-                aspectRatio: '16/10',
+                width: 'min(42vw, 380px)',
+                aspectRatio: '16/9',
               }}
             >
               <img
@@ -691,20 +699,40 @@ function App() {
                   bottom: 0,
                   left: 0,
                   right: 0,
-                  padding: '20px 24px',
-                  background: 'linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 100%)',
+                  padding: '18px 22px',
+                  background: 'linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 100%)',
                   borderRadius: '0 0 12px 12px',
                 }}
               >
-                <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: '4px' }}>
+                <p style={{ fontSize: '10px', color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: '4px' }}>
                   {project.category}
                 </p>
-                <h3 style={{ fontSize: '18px', fontWeight: 500, color: '#fff', letterSpacing: '-0.02em' }}>
+                <h3 style={{ fontSize: '17px', fontWeight: 500, color: '#fff', letterSpacing: '-0.02em' }}>
                   {project.title}
                 </h3>
               </div>
             </div>
           ))}
+
+          {/* Left arrow */}
+          <button
+            onClick={heroPrev}
+            className="hero-nav-arrow"
+            style={{ position: 'absolute', left: 'clamp(12px, 3vw, 40px)', zIndex: 30 }}
+            aria-label="Previous project"
+          >
+            <ChevronLeft size={22} />
+          </button>
+
+          {/* Right arrow */}
+          <button
+            onClick={heroNext}
+            className="hero-nav-arrow"
+            style={{ position: 'absolute', right: 'clamp(12px, 3vw, 40px)', zIndex: 30 }}
+            aria-label="Next project"
+          >
+            <ChevronRight size={22} />
+          </button>
         </div>
 
         {/* Dot pagination */}
