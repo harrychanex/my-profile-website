@@ -13,35 +13,35 @@ const projects = [
     title: 'Lumina Lounge',
     category: 'Hospitality',
     description: 'A premium hospitality experience with immersive digital presence.',
-    image: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80',
+    image: 'https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?auto=format&fit=crop&w=1200&q=80',
   },
   {
     id: 2,
     title: 'Nova Academy',
     category: 'Education',
     description: 'Modern education platform designed for the next generation.',
-    image: 'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=1200&q=80',
+    image: 'https://images.unsplash.com/photo-1497633762265-9d179a990aa6?auto=format&fit=crop&w=1200&q=80',
   },
   {
     id: 3,
     title: 'Aether AI',
     category: 'Technology',
     description: 'Cutting-edge AI product with intuitive user experience.',
-    image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=1200&q=80',
+    image: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=1200&q=80',
   },
   {
     id: 4,
     title: 'Monarch Estates',
     category: 'Real Estate',
     description: 'Luxury real estate brand with sophisticated digital presence.',
-    image: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1200&q=80',
+    image: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1200&q=80',
   },
   {
     id: 5,
     title: 'Pulse Fitness',
     category: 'Wellness',
     description: 'Dynamic wellness brand connecting people with health.',
-    image: 'https://images.unsplash.com/photo-1628155930542-3c7a64e2c848?auto=format&fit=crop&w=1200&q=80',
+    image: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=1200&q=80',
   },
 ];
 
@@ -51,22 +51,22 @@ const services = [
   {
     title: 'Web Design',
     description: 'Pixel-perfect interfaces crafted for conversion and delight. Every layout decision is intentional.',
-    image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=800&q=80',
+    image: 'https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?auto=format&fit=crop&w=800&q=80',
   },
   {
     title: 'Development',
     description: 'Clean, performant code that brings designs to life with precision and speed.',
-    image: 'https://images.unsplash.com/photo-1551650975-87deedd944c3?auto=format&fit=crop&w=800&q=80',
+    image: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=800&q=80',
   },
   {
     title: 'Brand Identity',
     description: 'Visual systems that communicate with clarity and resonate with your audience.',
-    image: 'https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&w=800&q=80',
+    image: 'https://images.unsplash.com/photo-1626785774573-4b799315345d?auto=format&fit=crop&w=800&q=80',
   },
   {
     title: 'Motion Design',
     description: 'Subtle animations that elevate the experience and guide users naturally.',
-    image: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=800&q=80',
+    image: 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=800&q=80',
   },
 ];
 
@@ -244,6 +244,8 @@ function App() {
 
   const navRef = useRef<HTMLElement>(null);
   const heroCardsRef = useRef<(HTMLDivElement | null)[]>([]);
+  const videoSectionRef = useRef<HTMLElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
   const statsRef = useRef<HTMLElement>(null);
   const worksRef = useRef<HTMLElement>(null);
   const servicesRef = useRef<HTMLElement>(null);
@@ -359,6 +361,39 @@ function App() {
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
   }, [heroNext, heroPrev]);
+
+  /* ─── Scroll-driven video playback ─── */
+  useEffect(() => {
+    const video = videoRef.current;
+    const section = videoSectionRef.current;
+    if (!video || !section) return;
+
+    // Wait for video metadata to load
+    const setup = () => {
+      const duration = video.duration;
+      if (!duration || isNaN(duration)) return;
+
+      ScrollTrigger.create({
+        trigger: section,
+        start: 'top top',
+        end: 'bottom bottom',
+        scrub: 0.5,
+        onUpdate: (self) => {
+          video.currentTime = self.progress * duration;
+        },
+      });
+    };
+
+    if (video.readyState >= 1) {
+      setup();
+    } else {
+      video.addEventListener('loadedmetadata', setup, { once: true });
+    }
+
+    return () => {
+      video.removeEventListener('loadedmetadata', setup);
+    };
+  }, []);
 
   /* ─── ScrollTrigger animations ─── */
   useEffect(() => {
@@ -756,6 +791,51 @@ function App() {
               aria-label={`Go to slide ${i + 1}`}
             />
           ))}
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════════
+          SCROLL VIDEO
+      ═══════════════════════════════════════════ */}
+      <section
+        ref={videoSectionRef}
+        style={{ position: 'relative', height: '400vh', background: '#000' }}
+      >
+        <div
+          style={{
+            position: 'sticky',
+            top: 0,
+            width: '100%',
+            height: '100vh',
+            overflow: 'hidden',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <video
+            ref={videoRef}
+            muted
+            playsInline
+            preload="auto"
+            style={{
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
+            }}
+          >
+            <source src="/hero-video.webm" type="video/webm" />
+            <source src="/hero-video.mp4" type="video/mp4" />
+          </video>
+          {/* Subtle vignette overlay */}
+          <div
+            style={{
+              position: 'absolute',
+              inset: 0,
+              background: 'radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.6) 100%)',
+              pointerEvents: 'none',
+            }}
+          />
         </div>
       </section>
 
