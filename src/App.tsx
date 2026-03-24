@@ -671,8 +671,8 @@ function App() {
               className="hero-card"
               onClick={() => goToHero(index)}
               style={{
-                width: 'min(42vw, 380px)',
-                aspectRatio: '16/9',
+                width: 'min(48vw, 520px)',
+                aspectRatio: '16/10',
               }}
             >
               <img
