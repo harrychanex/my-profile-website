@@ -10,42 +10,39 @@ gsap.registerPlugin(ScrollTrigger);
 const projects = [
   {
     id: 1,
-    title: 'Lumina Lounge',
-    category: 'Hospitality',
-    description: 'A premium hospitality experience with immersive digital presence.',
-    image: 'https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?auto=format&fit=crop&w=1200&q=80',
+    title: 'SparkGenie',
+    category: 'Education',
+    description: 'Children\'s English education platform with playful illustrations and bilingual interface.',
+    image: '/projects/sparkgenie-poster.jpg',
+    video: '/projects/sparkgenie.mp4',
   },
   {
     id: 2,
-    title: 'Nova Academy',
-    category: 'Education',
-    description: 'Modern education platform designed for the next generation.',
-    image: 'https://images.unsplash.com/photo-1497633762265-9d179a990aa6?auto=format&fit=crop&w=1200&q=80',
+    title: 'Kanto Café',
+    category: 'Food & Beverage',
+    description: 'Filipino-Korean fusion bakery with immersive 3D product showcase and online ordering.',
+    image: '/projects/kanto-cafe-poster.jpg',
+    video: '/projects/kanto-cafe.mp4',
   },
   {
     id: 3,
-    title: 'Aether AI',
-    category: 'Technology',
-    description: 'Cutting-edge AI product with intuitive user experience.',
-    image: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=1200&q=80',
+    title: 'Knightsbridge',
+    category: 'Hospitality',
+    description: 'Luxury London lounge with dark cinematic web presence and atmospheric branding.',
+    image: '/projects/knightsbridge-poster.jpg',
+    video: '/projects/knightsbridge.mp4',
   },
   {
     id: 4,
-    title: 'Monarch Estates',
-    category: 'Real Estate',
-    description: 'Luxury real estate brand with sophisticated digital presence.',
-    image: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1200&q=80',
-  },
-  {
-    id: 5,
-    title: 'Pulse Fitness',
-    category: 'Wellness',
-    description: 'Dynamic wellness brand connecting people with health.',
-    image: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=1200&q=80',
+    title: 'MOBA Barber',
+    category: 'Lifestyle',
+    description: 'Italian barber shop with bold visual identity and dynamic team showcase.',
+    image: '/projects/moba-barber-poster.jpg',
+    video: '/projects/moba-barber.mp4',
   },
 ];
 
-const categories = ['All', 'Hospitality', 'Education', 'Technology', 'Real Estate', 'Wellness'];
+const categories = ['All', 'Education', 'Food & Beverage', 'Hospitality', 'Lifestyle'];
 
 const services = [
   {
@@ -782,12 +779,23 @@ function App() {
                 aspectRatio: '16/10',
               }}
             >
-              <img
-                src={project.image}
-                alt={project.title}
-                style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
-                loading={index < 3 ? 'eager' : 'lazy'}
-              />
+              {project.video ? (
+                <video
+                  src={project.video}
+                  poster={project.image}
+                  muted
+                  loop
+                  playsInline
+                  autoPlay
+                  style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                />
+              ) : (
+                <img
+                  src={project.image}
+                  alt={project.title}
+                  style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                />
+              )}
               {/* Dark overlay (controlled by GSAP) */}
               <div
                 className="card-overlay"
@@ -1039,13 +1047,26 @@ function App() {
                   aspectRatio: '16/10',
                 }}
               >
-                <img
-                  src={project.image}
-                  alt={project.title}
-                  className="img-scale"
-                  style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
-                  loading="lazy"
-                />
+                {project.video ? (
+                  <video
+                    src={project.video}
+                    poster={project.image}
+                    muted
+                    loop
+                    playsInline
+                    autoPlay
+                    className="img-scale"
+                    style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                  />
+                ) : (
+                  <img
+                    src={project.image}
+                    alt={project.title}
+                    className="img-scale"
+                    style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                    loading="lazy"
+                  />
+                )}
                 {/* Text overlay at bottom left */}
                 <div
                   style={{
