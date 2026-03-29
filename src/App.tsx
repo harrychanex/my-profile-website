@@ -678,7 +678,21 @@ function App() {
           justifyContent: 'center',
         }}
       >
-        {/* Pure black background — reserved for custom background later */}
+        {/* Hero background video — plays once, freezes on last frame */}
+        <video
+          muted
+          playsInline
+          autoPlay
+          style={{
+            position: 'absolute',
+            inset: 0,
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+            zIndex: 0,
+          }}
+          src="/hero-bg.mp4"
+        />
 
         {/* Hero text content */}
         <div
