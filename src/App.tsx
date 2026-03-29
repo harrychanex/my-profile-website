@@ -988,7 +988,7 @@ function App() {
       <section
         ref={worksRef}
         id="work"
-        style={{ background: '#fff', padding: '100px 56px', color: '#000' }}
+        style={{ background: '#000', padding: '100px 56px', color: '#fff', borderTop: '1px solid rgba(255,255,255,0.07)' }}
       >
         <div style={{ maxWidth: '1120px', margin: '0 auto' }}>
 
@@ -999,14 +999,14 @@ function App() {
                 fontSize: 'clamp(36px, 4vw, 50px)',
                 fontWeight: 400,
                 letterSpacing: '-0.04em',
-                color: '#000',
+                color: '#fff',
                 marginBottom: '10px',
                 lineHeight: 1.1,
               }}
             >
               Selected works
             </h2>
-            <p style={{ fontSize: '14.6px', color: 'rgba(0,0,0,0.45)', letterSpacing: '-0.01em' }}>
+            <p style={{ fontSize: '14.6px', color: 'rgba(255,255,255,0.4)', letterSpacing: '-0.01em' }}>
               A curated collection of recent projects.
             </p>
           </div>
@@ -1117,7 +1117,7 @@ function App() {
       <section
         ref={servicesRef}
         id="services"
-        style={{ background: '#fff', padding: '100px 0 80px', color: '#000', borderTop: '1px solid rgba(0,0,0,0.06)' }}
+        style={{ background: '#000', padding: '100px 0 80px', color: '#fff', borderTop: '1px solid rgba(255,255,255,0.07)' }}
       >
         <div style={{ maxWidth: '1120px', margin: '0 auto', padding: '0 56px' }}>
           {/* Header row */}
@@ -1136,7 +1136,7 @@ function App() {
                 fontSize: 'clamp(32px, 3.5vw, 50px)',
                 fontWeight: 400,
                 letterSpacing: '-0.04em',
-                color: '#000',
+                color: '#fff',
                 lineHeight: 1.1,
               }}
             >
@@ -1145,7 +1145,7 @@ function App() {
             <p
               style={{
                 fontSize: '14.6px',
-                color: 'rgba(0,0,0,0.5)',
+                color: 'rgba(255,255,255,0.45)',
                 letterSpacing: '-0.01em',
                 lineHeight: 1.65,
                 paddingTop: '8px',
@@ -1229,7 +1229,7 @@ function App() {
               key={i}
               onClick={() => setServicesPage(i)}
               className={`dot-pill ${i === servicesPage ? 'active' : 'inactive'}`}
-              style={{ height: '5px', border: 'none', cursor: 'pointer', padding: 0, background: i === servicesPage ? 'rgba(0,0,0,0.7)' : 'rgba(0,0,0,0.2)' }}
+              style={{ height: '5px', border: 'none', cursor: 'pointer', padding: 0, background: i === servicesPage ? 'rgba(255,255,255,0.7)' : 'rgba(255,255,255,0.2)' }}
               aria-label={`Service page ${i + 1}`}
             />
           ))}
