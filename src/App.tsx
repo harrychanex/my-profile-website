@@ -678,25 +678,7 @@ function App() {
           justifyContent: 'center',
         }}
       >
-        {/* Background image of active project */}
-        <div
-          style={{
-            position: 'absolute',
-            inset: 0,
-            backgroundImage: `url(${projects[heroIndex].image})`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            transition: 'background-image 0.8s ease',
-          }}
-        />
-        {/* Gradient overlay */}
-        <div
-          style={{
-            position: 'absolute',
-            inset: 0,
-            background: 'linear-gradient(to bottom, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.35) 40%, rgba(0,0,0,0.75) 75%, #000 100%)',
-          }}
-        />
+        {/* Pure black background — reserved for custom background later */}
 
         {/* Hero text content */}
         <div
