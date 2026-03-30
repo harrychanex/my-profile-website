@@ -674,8 +674,7 @@ function App() {
           overflow: 'hidden',
           display: 'flex',
           flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
+          justifyContent: 'flex-end',
         }}
       >
         {/* Hero background video — plays once, freezes on last frame */}
@@ -694,27 +693,25 @@ function App() {
           src="/hero-bg.mp4"
         />
 
-        {/* Hero text content */}
+        {/* Hero text content — positioned bottom-left to not cover the person */}
         <div
           style={{
             position: 'relative',
             zIndex: 10,
-            textAlign: 'center',
-            paddingTop: '120px',
-            paddingBottom: '60px',
-            paddingLeft: '24px',
-            paddingRight: '24px',
+            textAlign: 'left',
+            padding: '0 56px 40px',
+            maxWidth: '600px',
           }}
         >
           <h1
             className="fade-up"
             style={{
-              fontSize: 'clamp(44px, 6vw, 72px)',
+              fontSize: 'clamp(36px, 5vw, 64px)',
               fontWeight: 300,
-              letterSpacing: '-0.06em',
+              letterSpacing: '-0.05em',
               lineHeight: 1.05,
               color: '#fff',
-              marginBottom: '32px',
+              marginBottom: '20px',
             }}
           >
             Design that<br />makes it real
@@ -724,8 +721,8 @@ function App() {
             style={{
               fontSize: '15px',
               fontWeight: 400,
-              color: 'rgba(255,255,255,0.65)',
-              marginBottom: '36px',
+              color: 'rgba(255,255,255,0.55)',
+              marginBottom: '28px',
               letterSpacing: '-0.01em',
             }}
           >
