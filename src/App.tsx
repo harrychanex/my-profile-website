@@ -685,9 +685,9 @@ function App() {
           autoPlay
           style={{
             position: 'absolute',
-            top: '50%',
+            top: '0',
             left: '50%',
-            transform: 'translate(-50%, -50%) scale(0.75)',
+            transform: 'translate(-50%, 0) scale(0.65)',
             width: '100%',
             height: '100%',
             objectFit: 'cover',
@@ -697,49 +697,6 @@ function App() {
           src="/hero-bg.mp4"
         />
 
-        {/* Hero text content */}
-        <div
-          style={{
-            position: 'relative',
-            zIndex: 10,
-            textAlign: 'center',
-            paddingTop: '120px',
-            paddingBottom: '60px',
-            paddingLeft: '24px',
-            paddingRight: '24px',
-          }}
-        >
-          <h1
-            className="fade-up"
-            style={{
-              fontSize: 'clamp(44px, 6vw, 72px)',
-              fontWeight: 300,
-              letterSpacing: '-0.06em',
-              lineHeight: 1.05,
-              color: '#fff',
-              marginBottom: '32px',
-            }}
-          >
-            Design that<br />makes it real
-          </h1>
-          <p
-            className="fade-up fade-up-d1"
-            style={{
-              fontSize: '15px',
-              fontWeight: 400,
-              color: 'rgba(255,255,255,0.65)',
-              marginBottom: '36px',
-              letterSpacing: '-0.01em',
-            }}
-          >
-            Crafting premium digital experiences.
-          </p>
-          <div className="fade-up fade-up-d2">
-            <a href="#work" className="btn-primary">
-              View Portfolio
-            </a>
-          </div>
-        </div>
 
         {/* Arc carousel */}
         <div
