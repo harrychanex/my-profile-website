@@ -674,7 +674,8 @@ function App() {
           overflow: 'hidden',
           display: 'flex',
           flexDirection: 'column',
-          justifyContent: 'flex-end',
+          alignItems: 'center',
+          justifyContent: 'center',
         }}
       >
         {/* Hero background video — plays once, freezes on last frame */}
@@ -684,34 +685,39 @@ function App() {
           autoPlay
           style={{
             position: 'absolute',
-            inset: 0,
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%) scale(0.75)',
             width: '100%',
             height: '100%',
             objectFit: 'cover',
             zIndex: 0,
+            borderRadius: '8px',
           }}
           src="/hero-bg.mp4"
         />
 
-        {/* Hero text content — positioned bottom-left to not cover the person */}
+        {/* Hero text content */}
         <div
           style={{
             position: 'relative',
             zIndex: 10,
-            textAlign: 'left',
-            padding: '0 56px 40px',
-            maxWidth: '600px',
+            textAlign: 'center',
+            paddingTop: '120px',
+            paddingBottom: '60px',
+            paddingLeft: '24px',
+            paddingRight: '24px',
           }}
         >
           <h1
             className="fade-up"
             style={{
-              fontSize: 'clamp(36px, 5vw, 64px)',
+              fontSize: 'clamp(44px, 6vw, 72px)',
               fontWeight: 300,
-              letterSpacing: '-0.05em',
+              letterSpacing: '-0.06em',
               lineHeight: 1.05,
               color: '#fff',
-              marginBottom: '20px',
+              marginBottom: '32px',
             }}
           >
             Design that<br />makes it real
@@ -721,8 +727,8 @@ function App() {
             style={{
               fontSize: '15px',
               fontWeight: 400,
-              color: 'rgba(255,255,255,0.55)',
-              marginBottom: '28px',
+              color: 'rgba(255,255,255,0.65)',
+              marginBottom: '36px',
               letterSpacing: '-0.01em',
             }}
           >
