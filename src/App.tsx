@@ -699,7 +699,7 @@ function App() {
 
 
         {/* Spacer to keep carousel in original position */}
-        <div style={{ paddingTop: '220px' }} />
+        <div style={{ paddingTop: '420px' }} />
 
         {/* Arc carousel */}
         <div
