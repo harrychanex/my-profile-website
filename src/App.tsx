@@ -686,8 +686,8 @@ function App() {
           style={{
             position: 'absolute',
             top: '0',
-            left: '50%',
-            transform: 'translate(-50%, 0) scale(0.65)',
+            left: '0',
+            transform: 'none',
             width: '100%',
             height: '100%',
             objectFit: 'cover',
