@@ -239,7 +239,10 @@ function App() {
   const [heroIndex, setHeroIndex] = useState(0);
   const [servicesPage, setServicesPage] = useState(0);
 
+  const [heroVideoEnded, setHeroVideoEnded] = useState(false);
+
   const navRef = useRef<HTMLElement>(null);
+  const heroVideoRef = useRef<HTMLVideoElement>(null);
   const heroCardsRef = useRef<(HTMLDivElement | null)[]>([]);
   const frameSectionRef = useRef<HTMLElement>(null);
   const frameCanvasRef = useRef<HTMLCanvasElement>(null);
@@ -325,6 +328,15 @@ function App() {
 
   /* ─── Set initial hero card positions ─── */
   useEffect(() => {
+    // Hide cards initially; they animate in after hero video ends
+    heroCardsRef.current.forEach((card) => {
+      if (!card) return;
+      gsap.set(card, { opacity: 0, y: 50 });
+    });
+  }, []);
+
+  useEffect(() => {
+    if (!heroVideoEnded) return;
     heroCardsRef.current.forEach((card, i) => {
       if (!card) return;
       const s = getCardStyle(i, 0);
@@ -343,13 +355,14 @@ function App() {
       const overlay = card.querySelector<HTMLDivElement>('.card-overlay');
       if (overlay) gsap.set(overlay, { opacity: s.overlayOpacity });
     });
-  }, [getCardStyle]);
+  }, [heroVideoEnded, getCardStyle]);
 
-  /* ─── Hero auto-advance ─── */
+  /* ─── Hero auto-advance (only after video ends) ─── */
   useEffect(() => {
+    if (!heroVideoEnded) return;
     const timer = setInterval(() => heroNext(), 5000);
     return () => clearInterval(timer);
-  }, [heroNext]);
+  }, [heroNext, heroVideoEnded]);
 
   /* ─── Keyboard nav ─── */
   useEffect(() => {
@@ -678,11 +691,13 @@ function App() {
           justifyContent: 'center',
         }}
       >
-        {/* Hero background video — plays once, freezes on last frame */}
+        {/* Hero background video — plays once, then carousel appears */}
         <video
+          ref={heroVideoRef}
           muted
           playsInline
           autoPlay
+          onEnded={() => setHeroVideoEnded(true)}
           style={{
             position: 'absolute',
             top: '0',
@@ -792,7 +807,7 @@ function App() {
           <button
             onClick={heroPrev}
             className="hero-nav-arrow"
-            style={{ position: 'absolute', left: 'clamp(12px, 3vw, 40px)', zIndex: 30 }}
+            style={{ position: 'absolute', left: 'clamp(12px, 3vw, 40px)', zIndex: 30, opacity: heroVideoEnded ? 1 : 0, pointerEvents: heroVideoEnded ? 'auto' : 'none', transition: 'opacity 0.6s ease' }}
             aria-label="Previous project"
           >
             <ChevronLeft size={22} />
@@ -802,7 +817,7 @@ function App() {
           <button
             onClick={heroNext}
             className="hero-nav-arrow"
-            style={{ position: 'absolute', right: 'clamp(12px, 3vw, 40px)', zIndex: 30 }}
+            style={{ position: 'absolute', right: 'clamp(12px, 3vw, 40px)', zIndex: 30, opacity: heroVideoEnded ? 1 : 0, pointerEvents: heroVideoEnded ? 'auto' : 'none', transition: 'opacity 0.6s ease' }}
             aria-label="Next project"
           >
             <ChevronRight size={22} />
@@ -819,6 +834,8 @@ function App() {
             gap: '8px',
             marginTop: '28px',
             marginBottom: '40px',
+            opacity: heroVideoEnded ? 1 : 0,
+            transition: 'opacity 0.6s ease',
           }}
         >
           {projects.map((_, i) => (
