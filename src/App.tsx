@@ -594,7 +594,11 @@ function App() {
       <nav
         ref={navRef}
         className={`fixed top-0 w-full z-50 flex items-center justify-between transition-all duration-500 ${navScrolled ? 'navbar-scrolled' : ''}`}
-        style={{ padding: '0 56px', height: '72px' }}
+        style={{
+          padding: '0 56px',
+          height: '72px',
+          background: navScrolled ? undefined : 'linear-gradient(to bottom, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.4) 60%, transparent 100%)',
+        }}
       >
         <a
           href="#"
