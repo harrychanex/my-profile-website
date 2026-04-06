@@ -1,93 +1,95 @@
-import { useEffect, useRef, useState, useCallback } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { ChevronLeft, ChevronRight, Menu, X, Plus, Minus } from 'lucide-react';
+import {
+  Menu, X, Plus, Minus, ChevronDown,
+  Monitor, Phone, Calendar, ArrowRight,
+  MessageCircle, Mail,
+} from 'lucide-react';
 import './App.css';
 
 gsap.registerPlugin(ScrollTrigger);
 
-/* ─── Project Data ─── */
+/* ─── Project Data (business language) ─── */
 const projects = [
   {
     id: 1,
-    title: 'SparkGenie',
-    category: 'Education',
-    description: 'Children\'s English education platform with playful illustrations and bilingual interface.',
-    image: '/projects/sparkgenie-poster.jpg',
-    video: '/projects/sparkgenie.mp4',
+    title: 'Knightsbridge Lounge',
+    category: 'Food & Beverage',
+    description: 'Luxury shisha lounge — built a dark, cinematic web presence that matches their premium brand.',
+    image: '/projects/knightsbridge-poster.jpg',
+    video: '/projects/knightsbridge.mp4',
   },
   {
     id: 2,
     title: 'Kanto Café',
     category: 'Food & Beverage',
-    description: 'Filipino-Korean fusion bakery with immersive 3D product showcase and online ordering.',
+    description: 'Filipino-Korean fusion bakery — created their first online menu and ordering experience.',
     image: '/projects/kanto-cafe-poster.jpg',
     video: '/projects/kanto-cafe.mp4',
   },
   {
     id: 3,
-    title: 'Knightsbridge',
-    category: 'Hospitality',
-    description: 'Luxury London lounge with dark cinematic web presence and atmospheric branding.',
-    image: '/projects/knightsbridge-poster.jpg',
-    video: '/projects/knightsbridge.mp4',
+    title: 'SparkGenie Education',
+    category: 'Education',
+    description: "Bilingual children's education platform — designed to help parents find and book classes easily.",
+    image: '/projects/sparkgenie-poster.jpg',
+    video: '/projects/sparkgenie.mp4',
   },
   {
     id: 4,
     title: 'MOBA Barber',
     category: 'Lifestyle',
-    description: 'Italian barber shop with bold visual identity and dynamic team showcase.',
+    description: "Italian barber shop — built their first-ever website with online booking integration.",
     image: '/projects/moba-barber-poster.jpg',
     video: '/projects/moba-barber.mp4',
   },
 ];
 
-const categories = ['All', 'Education', 'Food & Beverage', 'Hospitality', 'Lifestyle'];
+const categories = ['All', 'Food & Beverage', 'Lifestyle', 'Education'];
 
-const services = [
-  {
-    title: 'Web Design',
-    description: 'Pixel-perfect interfaces crafted for conversion and delight. Every layout decision is intentional.',
-    image: 'https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?auto=format&fit=crop&w=800&q=80',
-  },
-  {
-    title: 'Development',
-    description: 'Clean, performant code that brings designs to life with precision and speed.',
-    image: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=800&q=80',
-  },
-  {
-    title: 'Brand Identity',
-    description: 'Visual systems that communicate with clarity and resonate with your audience.',
-    image: 'https://images.unsplash.com/photo-1626785774573-4b799315345d?auto=format&fit=crop&w=800&q=80',
-  },
-  {
-    title: 'Motion Design',
-    description: 'Subtle animations that elevate the experience and guide users naturally.',
-    image: 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=800&q=80',
-  },
-];
-
+/* ─── FAQ Data (business-focused) ─── */
 const faqs = [
   {
-    question: 'What does your design process look like?',
-    answer: 'We start with a discovery phase to understand your goals, audience, and competitive landscape. From there we move into strategy, wireframing, visual design, and development — with your input at every stage. The result is a product that truly reflects your brand.',
+    question: 'What does your process look like?',
+    answer: 'Simple: Discovery call \u2192 Proposal \u2192 Build \u2192 Launch \u2192 Support. We start with a free 15-minute call to understand your business, then send you a clear proposal with pricing. Once approved, we build and launch \u2014 usually within 2\u20134 weeks for websites.',
   },
   {
     question: 'How long does a typical project take?',
-    answer: 'Most projects run between 6 and 12 weeks depending on scope. A focused brand identity refresh can be completed in 3–4 weeks, while a full website build with custom interactions typically takes 8–12 weeks. We\'ll provide a clear timeline before work begins.',
+    answer: 'Websites: 2\u20134 weeks from start to launch. AI Phone Reception: live within 24 hours of setup. Booking systems: 1\u20132 weeks. We always give you a clear timeline before starting.',
   },
   {
-    question: 'Do you work with startups and early-stage companies?',
-    answer: 'Absolutely. Some of our best work has been with early-stage companies who needed to establish a strong brand presence quickly. We offer flexible engagement models to suit different budgets and timelines.',
+    question: 'Do you work with small independent businesses?',
+    answer: "That\u2019s exactly who I work with. From barber shops to restaurants to caf\u00e9s \u2014 if you\u2019re an independent business owner who wants to grow, we should talk.",
   },
   {
-    question: 'What technologies do you build with?',
-    answer: 'We work primarily with React, Next.js, and Webflow for web builds, paired with Framer Motion or GSAP for animations. For e-commerce we use Shopify. We always recommend the right tool for the job rather than forcing a single stack.',
+    question: 'How does the AI phone reception actually work?',
+    answer: "It\u2019s like having a super-reliable receptionist. When customers call, AI answers naturally \u2014 it knows your menu, hours, and booking rules. It books tables or appointments automatically and sends confirmations via WhatsApp. Complex calls get forwarded to you. Try it yourself \u2014 WhatsApp us for a private demo.",
   },
   {
-    question: 'Do you offer ongoing support after launch?',
-    answer: 'Yes. We offer monthly retainer packages for ongoing design, development, and content updates. Many clients continue working with us after launch to iterate on features and keep their digital presence sharp.',
+    question: "What if I already have a website but it\u2019s outdated?",
+    answer: "I do redesigns too. Send me your current URL via WhatsApp and I\u2019ll give you a free audit with specific recommendations on what to improve.",
   },
+  {
+    question: 'What are your prices?',
+    answer: "Websites from \u00a31,500. AI Phone Reception from \u00a3149/month. Booking Systems from \u00a399/month. Every project gets a custom quote based on your specific needs \u2014 no hidden fees.",
+  },
+];
+
+/* ─── AI Reception comparison data ─── */
+const comparisonRows = [
+  { label: 'Monthly cost', staff: '\u00a3960+', ai: 'From \u00a3149' },
+  { label: 'Available', staff: 'Limited hours', ai: '24/7/365' },
+  { label: 'Misses calls?', staff: 'Up to 40%', ai: 'Never' },
+  { label: 'Sick days?', staff: 'Yes', ai: 'Never' },
+  { label: 'Books tables?', staff: 'Sometimes', ai: 'Always' },
+];
+
+const aiSteps = [
+  { num: '01', title: 'We learn your business', desc: 'Menu, hours, booking rules \u2014 everything your customers ask about.' },
+  { num: '02', title: 'AI answers your phone', desc: 'Natural voice, handles enquiries, takes bookings instantly.' },
+  { num: '03', title: 'Bookings flow in automatically', desc: 'WhatsApp confirmations, email alerts, calendar sync.' },
+  { num: '04', title: 'Complex calls go to you', desc: 'Complaints and special requests are forwarded to your mobile.' },
 ];
 
 /* ─── Globe Canvas Component ─── */
@@ -110,7 +112,6 @@ function GlobeCanvas() {
     const RADIUS = Math.min(width, height) * 0.38;
     let angle = 0;
 
-    // Pre-compute dots on a sphere using Fibonacci lattice
     const dots: { theta: number; phi: number }[] = [];
     const goldenAngle = Math.PI * (3 - Math.sqrt(5));
     for (let i = 0; i < DOT_COUNT; i++) {
@@ -118,7 +119,7 @@ function GlobeCanvas() {
       const r = Math.sqrt(1 - y * y);
       const theta = goldenAngle * i;
       dots.push({ theta, phi: Math.asin(y) });
-      void r; // used in render loop below
+      void r;
     }
 
     function render() {
@@ -133,25 +134,22 @@ function GlobeCanvas() {
         const { theta, phi } = dots[i];
         const rotTheta = theta + angle;
 
-        // 3D sphere coords
         const x3 = RADIUS * Math.cos(phi) * Math.cos(rotTheta);
         const y3 = RADIUS * Math.sin(phi);
         const z3 = RADIUS * Math.cos(phi) * Math.sin(rotTheta);
 
-        // Simple perspective projection
         const fov = RADIUS * 2.5;
         const scale = fov / (fov + z3 + RADIUS);
         const px = cx + x3 * scale;
         const py = cy - y3 * scale;
 
-        // Depth-based opacity
         const normalizedZ = (z3 + RADIUS) / (2 * RADIUS);
         const alpha = 0.15 + normalizedZ * 0.85;
         const dotSize = 0.8 + normalizedZ * 1.0;
 
         ctx.beginPath();
         ctx.arc(px, py, dotSize, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(255,255,255,${alpha.toFixed(2)})`;
+        ctx.fillStyle = `rgba(0,232,123,${(alpha * 0.7).toFixed(2)})`;
         ctx.fill();
       }
 
@@ -196,16 +194,16 @@ function FaqItem({ question, answer, index }: { question: string; answer: string
         <span
           className="flex-1 leading-tight"
           style={{
-            fontSize: 'clamp(20px, 2.5vw, 32px)',
-            fontWeight: 300,
+            fontSize: 'clamp(18px, 2.2vw, 28px)',
+            fontWeight: 500,
             color: 'rgba(255,255,255,0.9)',
             letterSpacing: '-0.02em',
-            fontFamily: "'Inter', sans-serif",
+            fontFamily: "'Syne', sans-serif",
           }}
         >
           {String(index + 1).padStart(2, '0')}. {question}
         </span>
-        <span className="flex-shrink-0 mt-1" style={{ color: 'rgba(255,255,255,0.4)' }}>
+        <span className="flex-shrink-0 mt-1" style={{ color: open ? '#00e87b' : 'rgba(255,255,255,0.4)', transition: 'color 0.3s ease' }}>
           {open ? <Minus size={20} /> : <Plus size={20} />}
         </span>
       </button>
@@ -220,7 +218,7 @@ function FaqItem({ question, answer, index }: { question: string; answer: string
         <p
           className="pb-8 max-w-[700px] leading-relaxed"
           style={{
-            fontSize: '14.6px',
+            fontSize: '15px',
             color: 'rgba(255,255,255,0.5)',
           }}
         >
@@ -231,30 +229,24 @@ function FaqItem({ question, answer, index }: { question: string; answer: string
   );
 }
 
-/* ─── Main App ─── */
+/* ═══════════════════════════════════════════
+    MAIN APP
+═══════════════════════════════════════════ */
 function App() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [navScrolled, setNavScrolled] = useState(false);
   const [activeCategory, setActiveCategory] = useState('All');
-  const [heroIndex, setHeroIndex] = useState(0);
-  const [servicesPage, setServicesPage] = useState(0);
 
-  const [heroVideoEnded, setHeroVideoEnded] = useState(false);
-
-  const navRef = useRef<HTMLElement>(null);
-  const heroVideoRef = useRef<HTMLVideoElement>(null);
-  const heroCardsRef = useRef<(HTMLDivElement | null)[]>([]);
+  const heroRef = useRef<HTMLElement>(null);
+  const servicesRef = useRef<HTMLElement>(null);
+  const worksRef = useRef<HTMLElement>(null);
   const frameSectionRef = useRef<HTMLElement>(null);
   const frameCanvasRef = useRef<HTMLCanvasElement>(null);
-  const framesRef = useRef<HTMLImageElement[]>([]);
   const frameIndexRef = useRef(0);
-  const statsRef = useRef<HTMLElement>(null);
-  const worksRef = useRef<HTMLElement>(null);
-  const servicesRef = useRef<HTMLElement>(null);
-  const trustRef = useRef<HTMLElement>(null);
+  const aiRef = useRef<HTMLElement>(null);
+  const aboutRef = useRef<HTMLElement>(null);
   const faqRef = useRef<HTMLElement>(null);
   const ctaRef = useRef<HTMLElement>(null);
-  const isAnimatingRef = useRef(false);
 
   /* ─── Navbar scroll ─── */
   useEffect(() => {
@@ -262,117 +254,6 @@ function App() {
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
-
-  /* ─── Hero carousel helpers — semicircular arc ─── */
-  const getCardStyle = useCallback((index: number, active: number) => {
-    const total = projects.length;
-    let diff = index - active;
-    if (diff > total / 2) diff -= total;
-    if (diff < -total / 2) diff += total;
-
-    const absDiff = Math.abs(diff);
-
-    // Arc geometry — cards sit on a semicircle
-    const arcSpread = 48; // degrees between each card
-    const angleDeg = diff * arcSpread;
-    const angleRad = (angleDeg * Math.PI) / 180;
-    const radiusX = 440;
-    const radiusY = 100;
-
-    const x = Math.sin(angleRad) * radiusX;
-    const y = (1 - Math.cos(angleRad)) * radiusY; // 0 at center, rises on sides
-
-    const scale = absDiff === 0 ? 1 : absDiff === 1 ? 0.82 : 0.65;
-    const opacity = absDiff <= 1 ? 1 : absDiff === 2 ? 0.4 : 0;
-    const blur = absDiff === 0 ? 0 : absDiff === 1 ? 2 : 5;
-    const brightness = absDiff === 0 ? 1 : 0.55;
-    const zIndex = 10 - absDiff;
-    const overlayOpacity = absDiff === 0 ? 0 : absDiff === 1 ? 0.35 : 0.6;
-
-    return { x, y, scale, opacity, blur, brightness, zIndex, overlayOpacity };
-  }, []);
-
-  const goToHero = useCallback((target: number) => {
-    if (isAnimatingRef.current) return;
-    const N = projects.length;
-    const next = ((target % N) + N) % N;
-
-    isAnimatingRef.current = true;
-    heroCardsRef.current.forEach((card, i) => {
-      if (!card) return;
-      const s = getCardStyle(i, next);
-      gsap.to(card, {
-        x: s.x,
-        y: s.y,
-        scale: s.scale,
-        opacity: s.opacity,
-        filter: `blur(${s.blur}px) brightness(${s.brightness})`,
-        zIndex: s.zIndex,
-        duration: 0.8,
-        ease: 'power3.inOut',
-        onComplete: i === 0 ? () => {
-          isAnimatingRef.current = false;
-        } : undefined,
-      });
-      const overlay = card.querySelector<HTMLDivElement>('.card-overlay');
-      if (overlay) {
-        gsap.to(overlay, { opacity: s.overlayOpacity, duration: 0.5 });
-      }
-    });
-
-    setHeroIndex(next);
-  }, [getCardStyle]);
-
-  const heroNext = useCallback(() => goToHero(heroIndex + 1), [heroIndex, goToHero]);
-  const heroPrev = useCallback(() => goToHero(heroIndex - 1), [heroIndex, goToHero]);
-
-  /* ─── Set initial hero card positions ─── */
-  useEffect(() => {
-    // Hide cards initially; they animate in after hero video ends
-    heroCardsRef.current.forEach((card) => {
-      if (!card) return;
-      gsap.set(card, { opacity: 0, y: 50 });
-    });
-  }, []);
-
-  useEffect(() => {
-    if (!heroVideoEnded) return;
-    heroCardsRef.current.forEach((card, i) => {
-      if (!card) return;
-      const s = getCardStyle(i, 0);
-      gsap.fromTo(card,
-        {
-          x: s.x, y: s.y + 50, scale: s.scale, opacity: 0,
-          filter: `blur(${s.blur}px) brightness(${s.brightness})`,
-          zIndex: s.zIndex,
-        },
-        {
-          x: s.x, y: s.y, opacity: s.opacity,
-          filter: `blur(${s.blur}px) brightness(${s.brightness})`,
-          duration: 1.1, delay: 0.4 + i * 0.08, ease: 'power2.out',
-        }
-      );
-      const overlay = card.querySelector<HTMLDivElement>('.card-overlay');
-      if (overlay) gsap.set(overlay, { opacity: s.overlayOpacity });
-    });
-  }, [heroVideoEnded, getCardStyle]);
-
-  /* ─── Hero auto-advance (only after video ends) ─── */
-  useEffect(() => {
-    if (!heroVideoEnded) return;
-    const timer = setInterval(() => heroNext(), 5000);
-    return () => clearInterval(timer);
-  }, [heroNext, heroVideoEnded]);
-
-  /* ─── Keyboard nav ─── */
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'ArrowRight') heroNext();
-      if (e.key === 'ArrowLeft') heroPrev();
-    };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [heroNext, heroPrev]);
 
   /* ─── Scroll-driven frame sequence ─── */
   useEffect(() => {
@@ -387,7 +268,6 @@ function App() {
     let pendingFrame: number | null = null;
     let rafId = 0;
 
-    // Size canvas to fill viewport (retina-aware)
     const sizeCanvas = () => {
       const dpr = window.devicePixelRatio || 1;
       const w = window.innerWidth;
@@ -397,11 +277,9 @@ function App() {
       canvas.style.width = w + 'px';
       canvas.style.height = h + 'px';
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      // Redraw current frame after resize
       drawFrame(frameIndexRef.current);
     };
 
-    // Draw image with "cover" behaviour
     const drawFrame = (index: number) => {
       const img = images[index];
       if (!img || !img.complete || img.naturalWidth === 0) return;
@@ -411,7 +289,6 @@ function App() {
       const iw = img.naturalWidth;
       const ih = img.naturalHeight;
 
-      // Cover calc
       const scale = Math.max(cw / iw, ch / ih);
       const dw = iw * scale;
       const dh = ih * scale;
@@ -423,7 +300,6 @@ function App() {
       frameIndexRef.current = index;
     };
 
-    // Preload all frames
     const images: HTMLImageElement[] = [];
     let loadedCount = 0;
 
@@ -440,9 +316,7 @@ function App() {
       };
       images[i] = img;
     }
-    framesRef.current = images;
 
-    // Use rAF to batch scroll updates for smoothness
     const scheduleFrame = (index: number) => {
       pendingFrame = index;
       if (!rafId) {
@@ -456,7 +330,6 @@ function App() {
       }
     };
 
-    // ScrollTrigger to scrub through frames
     const st = ScrollTrigger.create({
       trigger: section,
       start: 'top top',
@@ -480,49 +353,12 @@ function App() {
   /* ─── ScrollTrigger animations ─── */
   useEffect(() => {
     const ctx = gsap.context(() => {
-      // Stats — counter animation
-      if (statsRef.current) {
-        const statEls = statsRef.current.querySelectorAll<HTMLElement>('.stat-item');
-        gsap.fromTo(statEls,
-          { y: 50, opacity: 0 },
-          {
-            y: 0, opacity: 1, duration: 0.9, stagger: 0.15, ease: 'power2.out',
-            scrollTrigger: { trigger: statsRef.current, start: 'top 80%' },
-          }
-        );
-        statsRef.current.querySelectorAll<HTMLElement>('.stat-number').forEach(el => {
-          const target = parseInt(el.getAttribute('data-target') ?? '0', 10);
-          const suffix = el.getAttribute('data-suffix') ?? '';
-          const obj = { val: 0 };
-          gsap.to(obj, {
-            val: target,
-            duration: 2.5,
-            ease: 'power2.out',
-            scrollTrigger: { trigger: statsRef.current, start: 'top 80%' },
-            onUpdate() {
-              el.textContent = Math.round(obj.val) + suffix;
-            },
-          });
-        });
-      }
-
-      // Selected Works
-      if (worksRef.current) {
+      // Hero content
+      if (heroRef.current) {
         gsap.fromTo(
-          worksRef.current.querySelector('.works-header'),
-          { y: 60, opacity: 0 },
-          {
-            y: 0, opacity: 1, duration: 1, ease: 'power2.out',
-            scrollTrigger: { trigger: worksRef.current, start: 'top 80%' },
-          }
-        );
-        gsap.fromTo(
-          worksRef.current.querySelectorAll('.work-card'),
-          { y: 80, opacity: 0 },
-          {
-            y: 0, opacity: 1, duration: 0.9, stagger: 0.18, ease: 'power2.out',
-            scrollTrigger: { trigger: worksRef.current.querySelector('.works-grid'), start: 'top 80%' },
-          }
+          heroRef.current.querySelectorAll('.hero-anim'),
+          { y: 40, opacity: 0 },
+          { y: 0, opacity: 1, duration: 1.1, stagger: 0.15, ease: 'power2.out', delay: 0.3 }
         );
       }
 
@@ -536,16 +372,56 @@ function App() {
             scrollTrigger: { trigger: servicesRef.current, start: 'top 80%' },
           }
         );
+        gsap.fromTo(
+          servicesRef.current.querySelectorAll('.service-card'),
+          { y: 60, opacity: 0 },
+          {
+            y: 0, opacity: 1, duration: 0.8, stagger: 0.15, ease: 'power2.out',
+            scrollTrigger: { trigger: servicesRef.current.querySelector('.services-grid'), start: 'top 85%' },
+          }
+        );
       }
 
-      // Trust Banner
-      if (trustRef.current) {
+      // Works
+      if (worksRef.current) {
         gsap.fromTo(
-          trustRef.current.querySelectorAll('.trust-item'),
-          { y: 40, opacity: 0 },
+          worksRef.current.querySelector('.works-header'),
+          { y: 50, opacity: 0 },
           {
-            y: 0, opacity: 1, duration: 0.9, stagger: 0.15, ease: 'power2.out',
-            scrollTrigger: { trigger: trustRef.current, start: 'top 80%' },
+            y: 0, opacity: 1, duration: 0.9, ease: 'power2.out',
+            scrollTrigger: { trigger: worksRef.current, start: 'top 80%' },
+          }
+        );
+        gsap.fromTo(
+          worksRef.current.querySelectorAll('.work-card'),
+          { y: 70, opacity: 0 },
+          {
+            y: 0, opacity: 1, duration: 0.8, stagger: 0.15, ease: 'power2.out',
+            scrollTrigger: { trigger: worksRef.current.querySelector('.works-grid'), start: 'top 85%' },
+          }
+        );
+      }
+
+      // AI Reception
+      if (aiRef.current) {
+        gsap.fromTo(
+          aiRef.current.querySelectorAll('.ai-anim'),
+          { y: 50, opacity: 0 },
+          {
+            y: 0, opacity: 1, duration: 0.9, stagger: 0.12, ease: 'power2.out',
+            scrollTrigger: { trigger: aiRef.current, start: 'top 75%' },
+          }
+        );
+      }
+
+      // About
+      if (aboutRef.current) {
+        gsap.fromTo(
+          aboutRef.current.querySelectorAll('.about-anim'),
+          { y: 50, opacity: 0 },
+          {
+            y: 0, opacity: 1, duration: 0.9, stagger: 0.12, ease: 'power2.out',
+            scrollTrigger: { trigger: aboutRef.current, start: 'top 75%' },
           }
         );
       }
@@ -582,45 +458,52 @@ function App() {
     ? projects
     : projects.filter(p => p.category === activeCategory);
 
-  /* ─── Avatar colors for Trust Banner ─── */
-  const avatarColors = ['#c9a84c', '#e85d9a', '#5ba3c9', '#6dba6d', '#c94040'];
+  const navItems = ['Work', 'Services', 'AI Reception', 'About', 'Contact'];
 
   return (
-    <div className="min-h-screen" style={{ background: '#000', color: '#fff', fontFamily: "'Inter', sans-serif" }}>
+    <div className="min-h-screen" style={{ background: '#0a0a0f', color: '#fff', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+
+      {/* ─── Grain texture overlay ─── */}
+      <svg className="grain-overlay" aria-hidden="true">
+        <filter id="grain">
+          <feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch" />
+        </filter>
+        <rect width="100%" height="100%" filter="url(#grain)" />
+      </svg>
 
       {/* ═══════════════════════════════════════════
           NAVBAR
       ═══════════════════════════════════════════ */}
       <nav
-        ref={navRef}
         className={`fixed top-0 w-full z-50 flex items-center justify-between transition-all duration-500 ${navScrolled ? 'navbar-scrolled' : ''}`}
         style={{
-          padding: '0 56px',
+          padding: '0 clamp(20px, 4vw, 56px)',
           height: '72px',
-          background: navScrolled ? undefined : 'linear-gradient(to bottom, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.4) 60%, transparent 100%)',
+          background: navScrolled ? undefined : 'linear-gradient(to bottom, rgba(10,10,15,0.9) 0%, rgba(10,10,15,0.4) 60%, transparent 100%)',
         }}
       >
         <a
           href="#"
           style={{
-            fontSize: '13px',
-            fontWeight: 600,
-            letterSpacing: '0.1em',
-            color: 'rgba(255,255,255,0.9)',
+            fontSize: '14px',
+            fontWeight: 700,
+            letterSpacing: '0.12em',
+            color: '#fff',
             textDecoration: 'none',
+            fontFamily: "'Syne', sans-serif",
           }}
         >
           HARRY CHAN
         </a>
 
         {/* Desktop nav */}
-        <div className="hidden md:flex items-center gap-8">
-          {['Work', 'Services', 'About', 'Contact'].map(item => (
+        <div className="hidden lg:flex items-center gap-7">
+          {navItems.map(item => (
             <a
               key={item}
-              href={`#${item.toLowerCase()}`}
+              href={`#${item.toLowerCase().replace(' ', '-')}`}
               style={{
-                fontSize: '13.6px',
+                fontSize: '13px',
                 fontWeight: 400,
                 color: 'rgba(255,255,255,0.55)',
                 textDecoration: 'none',
@@ -633,18 +516,20 @@ function App() {
             </a>
           ))}
           <a
-            href="#contact"
-            className="btn-primary"
-            style={{ padding: '10px 22px', fontSize: '12px' }}
+            href="https://wa.me/447442242155?text=Hi%20Harry%2C%20I%27d%20like%20to%20discuss%20a%20project."
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn-green"
+            style={{ padding: '10px 24px', fontSize: '12px', fontWeight: 600, letterSpacing: '0.04em' }}
           >
-            Get Started
+            GET STARTED
           </a>
         </div>
 
         {/* Mobile hamburger */}
         <button
           onClick={() => setMenuOpen(!menuOpen)}
-          className="md:hidden"
+          className="lg:hidden"
           style={{ color: 'rgba(255,255,255,0.6)', background: 'none', border: 'none', cursor: 'pointer' }}
           aria-label="Toggle menu"
         >
@@ -656,27 +541,35 @@ function App() {
       {menuOpen && (
         <div
           className="fixed inset-0 z-40 flex flex-col items-center justify-center gap-10"
-          style={{ background: 'rgba(0,0,0,0.97)', backdropFilter: 'blur(12px)', animation: 'fadeUp 0.3s ease-out both' }}
+          style={{ background: 'rgba(10,10,15,0.97)', backdropFilter: 'blur(16px)', animation: 'fadeUp 0.3s ease-out both' }}
         >
-          {['Work', 'Services', 'About', 'Contact'].map(item => (
+          {navItems.map(item => (
             <a
               key={item}
-              href={`#${item.toLowerCase()}`}
+              href={`#${item.toLowerCase().replace(' ', '-')}`}
               onClick={() => setMenuOpen(false)}
               style={{
-                fontSize: '40px',
-                fontWeight: 300,
+                fontSize: '36px',
+                fontWeight: 600,
                 letterSpacing: '-0.03em',
                 color: 'rgba(255,255,255,0.8)',
                 textDecoration: 'none',
-                transition: 'color 0.2s ease',
+                fontFamily: "'Syne', sans-serif",
               }}
-              onMouseEnter={e => (e.currentTarget.style.color = '#fff')}
-              onMouseLeave={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.8)')}
             >
               {item}
             </a>
           ))}
+          <a
+            href="https://wa.me/447442242155?text=Hi%20Harry%2C%20I%27d%20like%20to%20discuss%20a%20project."
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn-green"
+            style={{ marginTop: '12px' }}
+            onClick={() => setMenuOpen(false)}
+          >
+            GET STARTED
+          </a>
         </div>
       )}
 
@@ -684,6 +577,7 @@ function App() {
           HERO
       ═══════════════════════════════════════════ */}
       <section
+        ref={heroRef}
         style={{
           position: 'relative',
           width: '100%',
@@ -693,271 +587,321 @@ function App() {
           flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'center',
+          padding: '120px clamp(20px, 4vw, 56px) 60px',
         }}
       >
-        {/* Hero background video — plays once, then carousel appears */}
+        {/* Hero background video */}
         <video
-          ref={heroVideoRef}
           muted
           playsInline
           autoPlay
-          onEnded={() => setHeroVideoEnded(true)}
+          loop
           style={{
             position: 'absolute',
-            top: '0',
-            left: '0',
-            transform: 'none',
+            top: 0,
+            left: 0,
             width: '100%',
             height: '100%',
             objectFit: 'cover',
             zIndex: 0,
-            borderRadius: '8px',
           }}
           src="/hero-bg.mp4"
         />
 
-
-        {/* Spacer to keep carousel in original position */}
-        <div style={{ paddingTop: '420px' }} />
-
-        {/* Arc carousel */}
+        {/* Dark overlay */}
         <div
           style={{
-            position: 'relative',
-            zIndex: 10,
-            width: '100%',
-            flex: '1 0 auto',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            minHeight: '340px',
-          }}
-        >
-          {/* Subtle arc track hint */}
-          <div style={{
             position: 'absolute',
-            width: '880px',
-            height: '200px',
-            bottom: '8%',
-            left: '50%',
-            transform: 'translateX(-50%)',
-            borderTop: '1px solid rgba(255,255,255,0.03)',
-            borderRadius: '50% 50% 0 0',
-            pointerEvents: 'none',
-          }} />
-
-          {projects.map((project, index) => (
-            <div
-              key={project.id}
-              ref={el => { heroCardsRef.current[index] = el; }}
-              className="hero-card"
-              onClick={() => goToHero(index)}
-              style={{
-                width: 'min(48vw, 520px)',
-                aspectRatio: '16/10',
-              }}
-            >
-              {project.video ? (
-                <video
-                  src={project.video}
-                  poster={project.image}
-                  muted
-                  loop
-                  playsInline
-                  autoPlay
-                  style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
-                />
-              ) : (
-                <img
-                  src={project.image}
-                  alt={project.title}
-                  style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
-                />
-              )}
-              {/* Dark overlay (controlled by GSAP) */}
-              <div
-                className="card-overlay"
-                style={{
-                  position: 'absolute',
-                  inset: 0,
-                  background: '#000',
-                  opacity: 0,
-                  borderRadius: '12px',
-                }}
-              />
-              {/* Text overlay */}
-              <div
-                style={{
-                  position: 'absolute',
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  padding: '18px 22px',
-                  background: 'linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 100%)',
-                  borderRadius: '0 0 12px 12px',
-                }}
-              >
-                <p style={{ fontSize: '10px', color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: '4px' }}>
-                  {project.category}
-                </p>
-                <h3 style={{ fontSize: '17px', fontWeight: 500, color: '#fff', letterSpacing: '-0.02em' }}>
-                  {project.title}
-                </h3>
-              </div>
-            </div>
-          ))}
-
-          {/* Left arrow */}
-          <button
-            onClick={heroPrev}
-            className="hero-nav-arrow"
-            style={{ position: 'absolute', left: 'clamp(12px, 3vw, 40px)', zIndex: 30, opacity: heroVideoEnded ? 1 : 0, pointerEvents: heroVideoEnded ? 'auto' : 'none', transition: 'opacity 0.6s ease' }}
-            aria-label="Previous project"
-          >
-            <ChevronLeft size={22} />
-          </button>
-
-          {/* Right arrow */}
-          <button
-            onClick={heroNext}
-            className="hero-nav-arrow"
-            style={{ position: 'absolute', right: 'clamp(12px, 3vw, 40px)', zIndex: 30, opacity: heroVideoEnded ? 1 : 0, pointerEvents: heroVideoEnded ? 'auto' : 'none', transition: 'opacity 0.6s ease' }}
-            aria-label="Next project"
-          >
-            <ChevronRight size={22} />
-          </button>
-        </div>
-
-        {/* Dot pagination */}
-        <div
-          style={{
-            position: 'relative',
-            zIndex: 10,
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            marginTop: '28px',
-            marginBottom: '40px',
-            opacity: heroVideoEnded ? 1 : 0,
-            transition: 'opacity 0.6s ease',
+            inset: 0,
+            background: 'linear-gradient(to bottom, rgba(10,10,15,0.65) 0%, rgba(10,10,15,0.55) 40%, rgba(10,10,15,0.8) 100%)',
+            zIndex: 1,
           }}
-        >
-          {projects.map((_, i) => (
-            <button
-              key={i}
-              onClick={() => goToHero(i)}
-              className={`dot-pill ${i === heroIndex ? 'active' : 'inactive'}`}
-              style={{ height: '5px', border: 'none', cursor: 'pointer', padding: 0 }}
-              aria-label={`Go to slide ${i + 1}`}
-            />
-          ))}
-        </div>
-      </section>
+        />
 
-      {/* ═══════════════════════════════════════════
-          SCROLL FRAME SEQUENCE
-      ═══════════════════════════════════════════ */}
-      <section
-        ref={frameSectionRef}
-        style={{ position: 'relative', height: '400vh', background: '#000' }}
-      >
-        <div
-          style={{
-            position: 'sticky',
-            top: 0,
-            width: '100%',
-            height: '100vh',
-            overflow: 'hidden',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          <canvas
-            ref={frameCanvasRef}
-            style={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              width: '100%',
-              height: '100%',
-            }}
-          />
-          {/* Subtle vignette overlay */}
-          <div
-            style={{
-              position: 'absolute',
-              inset: 0,
-              background: 'radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.6) 100%)',
-              pointerEvents: 'none',
-            }}
-          />
-        </div>
-      </section>
+        {/* Gradient orbs */}
+        <div className="gradient-orb gradient-orb-green" style={{ zIndex: 1 }} />
+        <div className="gradient-orb gradient-orb-blue" style={{ zIndex: 1 }} />
 
-      {/* ═══════════════════════════════════════════
-          STATS
-      ═══════════════════════════════════════════ */}
-      <section
-        ref={statsRef}
-        style={{ background: '#000', padding: '80px 56px', borderTop: '1px solid rgba(255,255,255,0.07)' }}
-      >
-        <div style={{ maxWidth: '960px', margin: '0 auto' }}>
-          <p
-            style={{
-              fontSize: '14.9px',
-              color: '#ddd',
-              textAlign: 'center',
-              marginBottom: '64px',
-              letterSpacing: '-0.01em',
-            }}
-          >
-            Trusted by clients who believe in exceptional digital craft.
-          </p>
+        {/* Hero content */}
+        <div style={{ position: 'relative', zIndex: 10, textAlign: 'center', maxWidth: '860px' }}>
+          {/* Stats row */}
           <div
+            className="hero-anim"
             style={{
               display: 'flex',
-              flexDirection: 'row' as const,
-              flexWrap: 'wrap' as const,
+              alignItems: 'center',
               justifyContent: 'center',
-              gap: '64px',
-              textAlign: 'center',
+              gap: 'clamp(16px, 3vw, 32px)',
+              marginBottom: '32px',
+              flexWrap: 'wrap',
             }}
           >
             {[
-              { num: 48, suffix: '+', label: 'Projects Delivered' },
-              { num: 12, suffix: '', label: 'Awards Won' },
-              { num: 7, suffix: '+', label: 'Years Experience' },
+              '48+ Projects Delivered',
+              '7+ Years Experience',
+              'Cambridge, UK',
             ].map((stat, i) => (
-              <div key={i} className="stat-item">
-                <div
-                  className="stat-number"
-                  data-target={stat.num}
-                  data-suffix={stat.suffix}
-                  style={{
-                    fontSize: 'clamp(48px, 5vw, 72px)',
-                    fontWeight: 300,
-                    letterSpacing: '-0.06em',
-                    color: '#fff',
-                    lineHeight: 1,
-                  }}
-                >
-                  0
-                </div>
-                <div
-                  style={{
-                    marginTop: '10px',
-                    fontSize: '11.8px',
-                    fontWeight: 400,
-                    color: 'rgba(255,255,255,0.4)',
-                    letterSpacing: '0.08em',
-                    textTransform: 'uppercase',
-                  }}
-                >
-                  {stat.label}
-                </div>
-              </div>
+              <span
+                key={i}
+                style={{
+                  fontSize: '12px',
+                  fontWeight: 500,
+                  color: 'rgba(255,255,255,0.45)',
+                  letterSpacing: '0.08em',
+                  textTransform: 'uppercase',
+                }}
+              >
+                {stat}
+              </span>
             ))}
+          </div>
+
+          {/* Headline */}
+          <h1
+            className="hero-anim"
+            style={{
+              fontSize: 'clamp(36px, 6vw, 72px)',
+              fontWeight: 700,
+              fontFamily: "'Syne', sans-serif",
+              letterSpacing: '-0.03em',
+              lineHeight: 1.08,
+              color: '#fff',
+              marginBottom: '20px',
+            }}
+          >
+            Your business deserves<br />to be seen.
+          </h1>
+
+          {/* Subline */}
+          <p
+            className="hero-anim"
+            style={{
+              fontSize: 'clamp(15px, 1.8vw, 18px)',
+              fontWeight: 400,
+              color: 'rgba(255,255,255,0.6)',
+              lineHeight: 1.6,
+              maxWidth: '600px',
+              margin: '0 auto 40px',
+            }}
+          >
+            I build websites, AI systems, and booking tools that bring customers to your door.
+          </p>
+
+          {/* CTA buttons */}
+          <div
+            className="hero-anim"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '16px',
+              flexWrap: 'wrap',
+            }}
+          >
+            <a href="#work" className="btn-green">
+              See My Work
+            </a>
+            <a
+              href="https://wa.me/447442242155?text=Hi%20Harry%2C%20I%27d%20like%20to%20book%20a%20free%20call."
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn-outline"
+            >
+              Book a Free Call
+            </a>
+          </div>
+        </div>
+
+        {/* Scroll indicator */}
+        <div
+          className="hero-anim scroll-indicator"
+          style={{
+            position: 'absolute',
+            bottom: '32px',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            zIndex: 10,
+            color: 'rgba(255,255,255,0.3)',
+          }}
+        >
+          <ChevronDown size={24} />
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════════
+          SERVICES
+      ═══════════════════════════════════════════ */}
+      <section
+        ref={servicesRef}
+        id="services"
+        style={{
+          background: '#0a0a0f',
+          padding: 'clamp(60px, 8vw, 100px) clamp(20px, 4vw, 56px)',
+          borderTop: '1px solid rgba(255,255,255,0.06)',
+        }}
+      >
+        <div style={{ maxWidth: '1120px', margin: '0 auto' }}>
+          {/* Header */}
+          <div className="services-header" style={{ textAlign: 'center', marginBottom: 'clamp(40px, 5vw, 64px)' }}>
+            <h2
+              style={{
+                fontSize: 'clamp(28px, 4vw, 48px)',
+                fontWeight: 700,
+                fontFamily: "'Syne', sans-serif",
+                letterSpacing: '-0.03em',
+                color: '#fff',
+                lineHeight: 1.1,
+                marginBottom: '12px',
+              }}
+            >
+              Three ways I grow your business
+            </h2>
+            <p style={{ fontSize: '15px', color: 'rgba(255,255,255,0.45)', maxWidth: '520px', margin: '0 auto' }}>
+              No jargon. No fluff. Just tools that bring you more customers and save you money.
+            </p>
+          </div>
+
+          {/* Cards grid */}
+          <div
+            className="services-grid"
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 320px), 1fr))',
+              gap: '20px',
+            }}
+          >
+            {/* Card 1: Website Design */}
+            <div className="service-card">
+              <div style={{ marginBottom: '20px', color: 'rgba(255,255,255,0.5)' }}>
+                <Monitor size={28} strokeWidth={1.5} />
+              </div>
+              <h3
+                style={{
+                  fontSize: '22px',
+                  fontWeight: 700,
+                  fontFamily: "'Syne', sans-serif",
+                  color: '#fff',
+                  letterSpacing: '-0.02em',
+                  marginBottom: '12px',
+                }}
+              >
+                Website Design &amp; Redesign
+              </h3>
+              <p style={{ fontSize: '14px', color: 'rgba(255,255,255,0.5)', lineHeight: 1.7, marginBottom: '20px' }}>
+                A stunning website that works as hard as you do. Designed to convert visitors into paying customers &mdash; not just look pretty.
+              </p>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '24px' }}>
+                {['Custom design', 'Mobile-optimised', 'SEO basics', 'Google Business'].map(item => (
+                  <span key={item} style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', padding: '4px 10px', borderRadius: '9999px', border: '1px solid rgba(255,255,255,0.08)' }}>
+                    {item}
+                  </span>
+                ))}
+              </div>
+              <div style={{ fontSize: '20px', fontWeight: 700, fontFamily: "'Syne', sans-serif", color: '#fff' }}>
+                From &pound;1,500
+              </div>
+            </div>
+
+            {/* Card 2: AI Phone Reception (Featured) */}
+            <div className="service-card featured">
+              {/* Badge */}
+              <div
+                style={{
+                  position: 'absolute',
+                  top: '-1px',
+                  right: '24px',
+                  background: '#00e87b',
+                  color: '#000',
+                  fontSize: '10px',
+                  fontWeight: 700,
+                  letterSpacing: '0.06em',
+                  padding: '6px 14px',
+                  borderRadius: '0 0 8px 8px',
+                  textTransform: 'uppercase',
+                }}
+              >
+                NEW &mdash; Most Popular
+              </div>
+              <div style={{ marginBottom: '20px', color: '#00e87b' }}>
+                <Phone size={28} strokeWidth={1.5} />
+              </div>
+              <h3
+                style={{
+                  fontSize: '22px',
+                  fontWeight: 700,
+                  fontFamily: "'Syne', sans-serif",
+                  color: '#fff',
+                  letterSpacing: '-0.02em',
+                  marginBottom: '12px',
+                }}
+              >
+                AI Phone Reception
+              </h3>
+              <p style={{ fontSize: '14px', color: 'rgba(255,255,255,0.5)', lineHeight: 1.7, marginBottom: '20px' }}>
+                An AI receptionist that answers your phone 24/7, books tables and appointments, and never calls in sick. Your staff can choose not to answer &mdash; AI never does.
+              </p>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '24px' }}>
+                {['24/7 answering', 'Auto bookings', 'WhatsApp alerts', 'Monthly reports'].map(item => (
+                  <span key={item} style={{ fontSize: '11px', color: 'rgba(0,232,123,0.6)', padding: '4px 10px', borderRadius: '9999px', border: '1px solid rgba(0,232,123,0.15)' }}>
+                    {item}
+                  </span>
+                ))}
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
+                <span style={{ fontSize: '20px', fontWeight: 700, fontFamily: "'Syne', sans-serif", color: '#00e87b' }}>
+                  From &pound;149/mo
+                </span>
+                <a
+                  href="#ai-reception"
+                  style={{
+                    fontSize: '13px',
+                    fontWeight: 500,
+                    color: 'rgba(255,255,255,0.6)',
+                    textDecoration: 'none',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '4px',
+                    transition: 'color 0.2s ease',
+                  }}
+                  onMouseEnter={e => (e.currentTarget.style.color = '#00e87b')}
+                  onMouseLeave={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.6)')}
+                >
+                  Learn more <ArrowRight size={14} />
+                </a>
+              </div>
+            </div>
+
+            {/* Card 3: Booking Systems */}
+            <div className="service-card">
+              <div style={{ marginBottom: '20px', color: 'rgba(255,255,255,0.5)' }}>
+                <Calendar size={28} strokeWidth={1.5} />
+              </div>
+              <h3
+                style={{
+                  fontSize: '22px',
+                  fontWeight: 700,
+                  fontFamily: "'Syne', sans-serif",
+                  color: '#fff',
+                  letterSpacing: '-0.02em',
+                  marginBottom: '12px',
+                }}
+              >
+                Booking &amp; Management Systems
+              </h3>
+              <p style={{ fontSize: '14px', color: 'rgba(255,255,255,0.5)', lineHeight: 1.7, marginBottom: '20px' }}>
+                Let customers book online without calling. Reduce no-shows with automatic reminders. Works for restaurants, salons, and any appointment-based business.
+              </p>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '24px' }}>
+                {['Online booking', 'Calendar sync', 'Auto reminders', 'Customer database'].map(item => (
+                  <span key={item} style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', padding: '4px 10px', borderRadius: '9999px', border: '1px solid rgba(255,255,255,0.08)' }}>
+                    {item}
+                  </span>
+                ))}
+              </div>
+              <div style={{ fontSize: '20px', fontWeight: 700, fontFamily: "'Syne', sans-serif", color: '#fff' }}>
+                From &pound;99/mo
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -968,26 +912,30 @@ function App() {
       <section
         ref={worksRef}
         id="work"
-        style={{ background: '#000', padding: '100px 56px', color: '#fff', borderTop: '1px solid rgba(255,255,255,0.07)' }}
+        style={{
+          background: '#0a0a0f',
+          padding: 'clamp(60px, 8vw, 100px) clamp(20px, 4vw, 56px)',
+          borderTop: '1px solid rgba(255,255,255,0.06)',
+        }}
       >
         <div style={{ maxWidth: '1120px', margin: '0 auto' }}>
-
           {/* Header */}
           <div className="works-header" style={{ marginBottom: '48px' }}>
             <h2
               style={{
-                fontSize: 'clamp(36px, 4vw, 50px)',
-                fontWeight: 400,
-                letterSpacing: '-0.04em',
+                fontSize: 'clamp(28px, 4vw, 48px)',
+                fontWeight: 700,
+                fontFamily: "'Syne', sans-serif",
+                letterSpacing: '-0.03em',
                 color: '#fff',
-                marginBottom: '10px',
+                marginBottom: '8px',
                 lineHeight: 1.1,
               }}
             >
               Selected works
             </h2>
-            <p style={{ fontSize: '14.6px', color: 'rgba(255,255,255,0.4)', letterSpacing: '-0.01em' }}>
-              A curated collection of recent projects.
+            <p style={{ fontSize: '15px', color: 'rgba(255,255,255,0.4)' }}>
+              Real projects for real businesses.
             </p>
           </div>
 
@@ -995,10 +943,9 @@ function App() {
           <div
             style={{
               display: 'flex',
-              flexWrap: 'wrap' as const,
+              flexWrap: 'wrap',
               gap: '8px',
-              marginBottom: '48px',
-              overflowX: 'auto',
+              marginBottom: '40px',
             }}
           >
             {categories.map(cat => (
@@ -1013,7 +960,7 @@ function App() {
           </div>
 
           {/* Works grid */}
-          <div className="works-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 480px), 1fr))', gap: '24px' }}>
+          <div className="works-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 480px), 1fr))', gap: '20px' }}>
             {filteredProjects.map(project => (
               <div
                 key={project.id}
@@ -1047,41 +994,45 @@ function App() {
                     loading="lazy"
                   />
                 )}
-                {/* Text overlay at bottom left */}
+                {/* Overlay */}
                 <div
                   style={{
                     position: 'absolute',
                     inset: 0,
-                    background: 'linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.15) 50%, transparent 100%)',
+                    background: 'linear-gradient(to top, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.15) 50%, transparent 100%)',
                     display: 'flex',
                     flexDirection: 'column',
                     justifyContent: 'flex-end',
-                    padding: '28px 32px',
+                    padding: 'clamp(20px, 3vw, 32px)',
                   }}
                 >
                   <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between' }}>
                     <div>
+                      <span style={{ fontSize: '10px', color: '#00e87b', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 600, marginBottom: '4px', display: 'block' }}>
+                        {project.category}
+                      </span>
                       <h3
                         style={{
-                          fontSize: 'clamp(22px, 2.5vw, 33px)',
-                          fontWeight: 400,
+                          fontSize: 'clamp(20px, 2.5vw, 30px)',
+                          fontWeight: 700,
+                          fontFamily: "'Syne', sans-serif",
                           color: '#fff',
-                          letterSpacing: '-0.03em',
+                          letterSpacing: '-0.02em',
                           lineHeight: 1.1,
                           marginBottom: '6px',
                         }}
                       >
                         {project.title}
                       </h3>
-                      <p style={{ fontSize: '14.6px', color: 'rgba(255,255,255,0.65)', letterSpacing: '-0.01em' }}>
+                      <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.6)', maxWidth: '360px' }}>
                         {project.description}
                       </p>
                     </div>
                     <span
                       className="work-card-arrow"
-                      style={{ fontSize: '24px', color: '#fff', marginLeft: '16px', flexShrink: 0 }}
+                      style={{ fontSize: '22px', color: '#fff', marginLeft: '16px', flexShrink: 0 }}
                     >
-                      →
+                      &rarr;
                     </span>
                   </div>
                 </div>
@@ -1092,177 +1043,287 @@ function App() {
       </section>
 
       {/* ═══════════════════════════════════════════
-          SERVICES
+          SCROLL FRAME SEQUENCE
       ═══════════════════════════════════════════ */}
       <section
-        ref={servicesRef}
-        id="services"
-        style={{ background: '#000', padding: '100px 0 80px', color: '#fff', borderTop: '1px solid rgba(255,255,255,0.07)' }}
+        ref={frameSectionRef}
+        style={{ position: 'relative', height: '400vh', background: '#0a0a0f' }}
       >
-        <div style={{ maxWidth: '1120px', margin: '0 auto', padding: '0 56px' }}>
-          {/* Header row */}
-          <div
-            className="services-header"
-            style={{
-              display: 'grid',
-              gridTemplateColumns: '1fr 1fr',
-              gap: '48px',
-              alignItems: 'start',
-              marginBottom: '56px',
-            }}
-          >
-            <h2
-              style={{
-                fontSize: 'clamp(32px, 3.5vw, 50px)',
-                fontWeight: 400,
-                letterSpacing: '-0.04em',
-                color: '#fff',
-                lineHeight: 1.1,
-              }}
-            >
-              Everything you need<br />in one studio
-            </h2>
-            <p
-              style={{
-                fontSize: '14.6px',
-                color: 'rgba(255,255,255,0.45)',
-                letterSpacing: '-0.01em',
-                lineHeight: 1.65,
-                paddingTop: '8px',
-              }}
-            >
-              From brand strategy to live website, we handle every layer of your digital presence. One team, one vision, one seamless process.
-            </p>
-          </div>
-        </div>
-
-        {/* Horizontal scroll cards */}
-        <div
-          className="services-scroll"
-          style={{ display: 'flex', gap: '16px', padding: '0 56px', paddingRight: '40px' }}
-        >
-          {services.map((service, i) => (
-            <div
-              key={i}
-              className="service-scroll-card"
-              style={{
-                width: '430px',
-                height: '583px',
-                borderRadius: '12px',
-                background: '#2f2f2f',
-                overflow: 'hidden',
-                position: 'relative',
-                flexShrink: 0,
-              }}
-            >
-              <img
-                src={service.image}
-                alt={service.title}
-                style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', opacity: 0.55 }}
-                loading="lazy"
-              />
-              <div
-                style={{
-                  position: 'absolute',
-                  inset: 0,
-                  background: 'linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.2) 60%, transparent 100%)',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  justifyContent: 'flex-end',
-                  padding: '32px',
-                }}
-              >
-                <h3
-                  style={{
-                    fontSize: '24px',
-                    fontWeight: 500,
-                    color: '#fff',
-                    letterSpacing: '-0.02em',
-                    marginBottom: '10px',
-                  }}
-                >
-                  {service.title}
-                </h3>
-                <p style={{ fontSize: '11.8px', color: 'rgba(255,255,255,0.65)', lineHeight: 1.6, marginBottom: '20px' }}>
-                  {service.description}
-                </p>
-                <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                  <span style={{ fontSize: '20px', color: 'rgba(255,255,255,0.6)' }}>→</span>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {/* Dot pagination for services */}
         <div
           style={{
+            position: 'sticky',
+            top: 0,
+            width: '100%',
+            height: '100vh',
+            overflow: 'hidden',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            gap: '8px',
-            marginTop: '36px',
           }}
         >
-          {services.map((_, i) => (
-            <button
-              key={i}
-              onClick={() => setServicesPage(i)}
-              className={`dot-pill ${i === servicesPage ? 'active' : 'inactive'}`}
-              style={{ height: '5px', border: 'none', cursor: 'pointer', padding: 0, background: i === servicesPage ? 'rgba(255,255,255,0.7)' : 'rgba(255,255,255,0.2)' }}
-              aria-label={`Service page ${i + 1}`}
-            />
-          ))}
+          <canvas
+            ref={frameCanvasRef}
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              width: '100%',
+              height: '100%',
+            }}
+          />
+          {/* Vignette overlay */}
+          <div
+            style={{
+              position: 'absolute',
+              inset: 0,
+              background: 'radial-gradient(ellipse at center, transparent 50%, rgba(10,10,15,0.7) 100%)',
+              pointerEvents: 'none',
+            }}
+          />
         </div>
       </section>
 
       {/* ═══════════════════════════════════════════
-          TRUST BANNER
+          AI RECEPTION DEEP-DIVE
       ═══════════════════════════════════════════ */}
       <section
-        ref={trustRef}
+        ref={aiRef}
+        id="ai-reception"
         style={{
-          background: '#000',
-          padding: '100px 56px',
-          textAlign: 'center',
+          position: 'relative',
+          background: '#060d08',
+          padding: 'clamp(60px, 8vw, 100px) clamp(20px, 4vw, 56px)',
+          overflow: 'hidden',
+          borderTop: '1px solid rgba(0,232,123,0.1)',
+        }}
+      >
+        {/* Subtle green glow bg */}
+        <div
+          style={{
+            position: 'absolute',
+            top: '-200px',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            width: '800px',
+            height: '800px',
+            borderRadius: '50%',
+            background: 'radial-gradient(circle, rgba(0,232,123,0.06) 0%, transparent 60%)',
+            pointerEvents: 'none',
+          }}
+        />
+
+        <div style={{ maxWidth: '960px', margin: '0 auto', position: 'relative', zIndex: 2 }}>
+          {/* Heading */}
+          <div className="ai-anim" style={{ textAlign: 'center', marginBottom: 'clamp(40px, 5vw, 64px)' }}>
+            <span style={{ fontSize: '12px', fontWeight: 600, color: '#00e87b', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '16px', display: 'block' }}>
+              CallGenius AI
+            </span>
+            <h2
+              style={{
+                fontSize: 'clamp(26px, 4vw, 46px)',
+                fontWeight: 700,
+                fontFamily: "'Syne', sans-serif",
+                letterSpacing: '-0.03em',
+                color: '#fff',
+                lineHeight: 1.1,
+                marginBottom: '16px',
+              }}
+            >
+              Your staff can choose not to answer.<br />AI never does.
+            </h2>
+            <p style={{ fontSize: '15px', color: 'rgba(255,255,255,0.45)', maxWidth: '520px', margin: '0 auto' }}>
+              AI phone reception built for UK restaurants and salons.
+            </p>
+          </div>
+
+          {/* Comparison table */}
+          <div className="ai-anim comparison-table" style={{ marginBottom: 'clamp(48px, 6vw, 72px)', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.06)', overflow: 'hidden', background: 'rgba(255,255,255,0.02)' }}>
+            <table>
+              <thead>
+                <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
+                  <th style={{ width: '35%' }}></th>
+                  <th className="staff-col" style={{ width: '32.5%' }}>Your Current Staff</th>
+                  <th style={{ width: '32.5%', color: '#00e87b' }}>CallGenius AI</th>
+                </tr>
+              </thead>
+              <tbody>
+                {comparisonRows.map((row, i) => (
+                  <tr key={i}>
+                    <td>{row.label}</td>
+                    <td className="staff-col">{row.staff}</td>
+                    <td className="ai-col">{row.ai}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {/* How it works */}
+          <div className="ai-anim" style={{ marginBottom: '16px' }}>
+            <h3
+              style={{
+                fontSize: 'clamp(22px, 3vw, 32px)',
+                fontWeight: 700,
+                fontFamily: "'Syne', sans-serif",
+                color: '#fff',
+                letterSpacing: '-0.02em',
+                textAlign: 'center',
+                marginBottom: 'clamp(28px, 4vw, 48px)',
+              }}
+            >
+              How it works
+            </h3>
+          </div>
+
+          <div
+            className="ai-anim"
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 200px), 1fr))',
+              gap: '16px',
+              marginBottom: 'clamp(48px, 6vw, 72px)',
+            }}
+          >
+            {aiSteps.map((step) => (
+              <div key={step.num} className="step-card">
+                <span style={{ fontSize: '28px', fontWeight: 800, fontFamily: "'Syne', sans-serif", color: '#00e87b', display: 'block', marginBottom: '12px' }}>
+                  {step.num}
+                </span>
+                <h4 style={{ fontSize: '16px', fontWeight: 600, color: '#fff', marginBottom: '8px', lineHeight: 1.3 }}>
+                  {step.title}
+                </h4>
+                <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.45)', lineHeight: 1.6 }}>
+                  {step.desc}
+                </p>
+              </div>
+            ))}
+          </div>
+
+          {/* Demo CTA */}
+          <div className="ai-anim" style={{ textAlign: 'center' }}>
+            <div
+              style={{
+                background: 'rgba(0,232,123,0.06)',
+                border: '1px solid rgba(0,232,123,0.15)',
+                borderRadius: '12px',
+                padding: '24px 32px',
+                marginBottom: '20px',
+                maxWidth: '520px',
+                margin: '0 auto 20px',
+              }}
+            >
+              <p style={{ fontSize: '14px', color: 'rgba(255,255,255,0.6)', marginBottom: '4px' }}>
+                Live demo coming soon
+              </p>
+              <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.4)' }}>
+                WhatsApp us to arrange a private demo for your business.
+              </p>
+            </div>
+            <a
+              href="https://wa.me/447442242155?text=Hi%20Harry%2C%20I%27m%20interested%20in%20the%20AI%20phone%20reception%20demo."
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn-whatsapp"
+            >
+              <MessageCircle size={18} />
+              WhatsApp Us
+            </a>
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════════
+          ABOUT
+      ═══════════════════════════════════════════ */}
+      <section
+        ref={aboutRef}
+        id="about"
+        style={{
+          background: '#0a0a0f',
+          padding: 'clamp(60px, 8vw, 100px) clamp(20px, 4vw, 56px)',
           borderTop: '1px solid rgba(255,255,255,0.06)',
         }}
       >
-        {/* Avatar row */}
         <div
-          className="trust-item"
-          style={{ display: 'flex', justifyContent: 'center', marginBottom: '36px' }}
-        >
-          {avatarColors.map((color, i) => (
-            <div
-              key={i}
-              style={{
-                width: '48px',
-                height: '48px',
-                borderRadius: '50%',
-                background: color,
-                border: '2px solid #000',
-                marginLeft: i === 0 ? 0 : '-12px',
-                position: 'relative',
-                zIndex: 5 - i,
-              }}
-            />
-          ))}
-        </div>
-        <h2
-          className="trust-item"
           style={{
-            fontSize: 'clamp(28px, 3.5vw, 42px)',
-            fontWeight: 500,
-            color: '#fff',
-            letterSpacing: '-0.04em',
-            lineHeight: 1.15,
-            maxWidth: '640px',
+            maxWidth: '1000px',
             margin: '0 auto',
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 380px), 1fr))',
+            gap: 'clamp(32px, 5vw, 64px)',
+            alignItems: 'center',
           }}
         >
-          Trusted by forward-thinking brands worldwide
-        </h2>
+          {/* Photo / visual block */}
+          <div
+            className="about-anim"
+            style={{
+              aspectRatio: '4/5',
+              borderRadius: '16px',
+              background: 'linear-gradient(145deg, #0f1a12 0%, #0a0a0f 40%, #0d0f1a 100%)',
+              border: '1px solid rgba(255,255,255,0.06)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              overflow: 'hidden',
+              position: 'relative',
+            }}
+          >
+            {/* Accent glow */}
+            <div style={{ position: 'absolute', bottom: '-60px', right: '-60px', width: '300px', height: '300px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(0,232,123,0.08), transparent 70%)', pointerEvents: 'none' }} />
+            <span
+              style={{
+                fontSize: 'clamp(80px, 12vw, 140px)',
+                fontWeight: 800,
+                fontFamily: "'Syne', sans-serif",
+                color: 'rgba(255,255,255,0.04)',
+                letterSpacing: '-0.04em',
+                userSelect: 'none',
+              }}
+            >
+              HC
+            </span>
+          </div>
+
+          {/* Text */}
+          <div className="about-anim">
+            <span style={{ fontSize: '12px', fontWeight: 600, color: '#00e87b', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '16px', display: 'block' }}>
+              About
+            </span>
+            <h2
+              style={{
+                fontSize: 'clamp(28px, 3.5vw, 40px)',
+                fontWeight: 700,
+                fontFamily: "'Syne', sans-serif",
+                letterSpacing: '-0.03em',
+                color: '#fff',
+                lineHeight: 1.1,
+                marginBottom: '20px',
+              }}
+            >
+              Meet Harry
+            </h2>
+            <p style={{ fontSize: '15px', color: 'rgba(255,255,255,0.55)', lineHeight: 1.8, marginBottom: '16px' }}>
+              I&rsquo;m Harry &mdash; a Cambridge-based digital consultant who&rsquo;s spent 7+ years helping businesses look and perform better online.
+            </p>
+            <p style={{ fontSize: '15px', color: 'rgba(255,255,255,0.55)', lineHeight: 1.8, marginBottom: '16px' }}>
+              I started by building websites for local shops, and now I specialise in AI-powered tools that save business owners time and money.
+            </p>
+            <p style={{ fontSize: '15px', color: 'rgba(255,255,255,0.55)', lineHeight: 1.8, marginBottom: '28px' }}>
+              When I&rsquo;m not building, I&rsquo;m coaching badminton to 40+ students across Cambridge. I bring the same energy to every project: obsessive attention to detail, honest advice, and results that actually matter to your bottom line.
+            </p>
+
+            {/* Tech badges */}
+            <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.3)', letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: '12px' }}>
+              Technologies I work with
+            </p>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+              {['React', 'Next.js', 'Supabase', 'Retell AI', 'Vercel'].map(tech => (
+                <span key={tech} className="tech-badge">{tech}</span>
+              ))}
+            </div>
+          </div>
+        </div>
       </section>
 
       {/* ═══════════════════════════════════════════
@@ -1270,20 +1331,20 @@ function App() {
       ═══════════════════════════════════════════ */}
       <section
         ref={faqRef}
-        id="about"
         style={{
-          background: '#000',
-          padding: '100px 56px',
-          borderTop: '1px solid rgba(255,255,255,0.08)',
+          background: '#0a0a0f',
+          padding: 'clamp(60px, 8vw, 100px) clamp(20px, 4vw, 56px)',
+          borderTop: '1px solid rgba(255,255,255,0.06)',
         }}
       >
         <div style={{ maxWidth: '860px', margin: '0 auto' }}>
-          <div className="faq-header" style={{ marginBottom: '56px' }}>
+          <div className="faq-header" style={{ marginBottom: '48px' }}>
             <h2
               style={{
-                fontSize: 'clamp(32px, 3.5vw, 50px)',
-                fontWeight: 400,
-                letterSpacing: '-0.04em',
+                fontSize: 'clamp(28px, 4vw, 48px)',
+                fontWeight: 700,
+                fontFamily: "'Syne', sans-serif",
+                letterSpacing: '-0.03em',
                 color: '#fff',
                 lineHeight: 1.1,
               }}
@@ -1300,19 +1361,18 @@ function App() {
       </section>
 
       {/* ═══════════════════════════════════════════
-          CTA — Particle Globe
+          CONTACT / CTA
       ═══════════════════════════════════════════ */}
       <section
         ref={ctaRef}
         id="contact"
         style={{
           position: 'relative',
-          background: '#000',
-          padding: '120px 56px',
+          background: '#0a0a0f',
+          padding: 'clamp(80px, 10vw, 140px) clamp(20px, 4vw, 56px)',
           textAlign: 'center',
           overflow: 'hidden',
-          borderTop: '1px solid rgba(255,255,255,0.08)',
-          borderBottom: '1px solid rgba(255,255,255,0.25)',
+          borderTop: '1px solid rgba(255,255,255,0.06)',
         }}
       >
         <GlobeCanvas />
@@ -1320,33 +1380,93 @@ function App() {
           <h2
             className="cta-anim"
             style={{
-              fontSize: 'clamp(42px, 6vw, 72px)',
-              fontWeight: 300,
-              letterSpacing: '-0.041em',
+              fontSize: 'clamp(32px, 5.5vw, 64px)',
+              fontWeight: 700,
+              fontFamily: "'Syne', sans-serif",
+              letterSpacing: '-0.03em',
               color: '#fff',
-              lineHeight: 1.05,
-              marginBottom: '24px',
+              lineHeight: 1.08,
+              marginBottom: '16px',
             }}
           >
-            Start your project<br />today
+            Ready to grow<br />your business?
           </h2>
           <p
             className="cta-anim"
             style={{
-              fontSize: '15px',
-              fontWeight: 500,
-              color: 'rgba(255,255,255,0.55)',
-              marginBottom: '44px',
-              letterSpacing: '-0.01em',
+              fontSize: '16px',
+              fontWeight: 400,
+              color: 'rgba(255,255,255,0.5)',
+              marginBottom: '40px',
             }}
           >
-            No commitment required. Let&rsquo;s explore the possibilities.
+            Book a free 15-minute call. No pressure, no commitment.
           </p>
-          <div className="cta-anim">
-            <a href="mailto:hello@harrychan.co" className="btn-primary">
-              Get Started
+
+          {/* CTA buttons */}
+          <div
+            className="cta-anim"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '16px',
+              flexWrap: 'wrap',
+              marginBottom: '48px',
+            }}
+          >
+            <a
+              href="https://wa.me/447442242155?text=Hi%20Harry%2C%20I%27d%20like%20to%20discuss%20a%20project."
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn-whatsapp"
+            >
+              <MessageCircle size={18} />
+              WhatsApp Me Now
+            </a>
+            <a
+              href="mailto:harrychanex@gmail.com"
+              className="btn-outline"
+              style={{ padding: '18px 36px', fontSize: '15px' }}
+            >
+              <Mail size={18} />
+              Send an Email
             </a>
           </div>
+
+          {/* Social links */}
+          <div className="cta-anim" style={{ marginBottom: '24px' }}>
+            <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.3)', letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: '12px', display: 'block' }}>
+              Or find me on
+            </span>
+            <div style={{ display: 'flex', justifyContent: 'center', gap: '20px' }}>
+              {[
+                { label: 'Instagram', href: '#' },
+                { label: 'LinkedIn', href: '#' },
+              ].map(social => (
+                <a
+                  key={social.label}
+                  href={social.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    fontSize: '14px',
+                    color: 'rgba(255,255,255,0.5)',
+                    textDecoration: 'none',
+                    transition: 'color 0.2s ease',
+                  }}
+                  onMouseEnter={e => (e.currentTarget.style.color = '#00e87b')}
+                  onMouseLeave={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.5)')}
+                >
+                  {social.label}
+                </a>
+              ))}
+            </div>
+          </div>
+
+          <p className="cta-anim" style={{ fontSize: '13px', color: 'rgba(255,255,255,0.25)' }}>
+            Cambridge, UK &middot; harrychanex@gmail.com
+          </p>
         </div>
       </section>
 
@@ -1355,8 +1475,8 @@ function App() {
       ═══════════════════════════════════════════ */}
       <footer
         style={{
-          background: '#000',
-          padding: '80px 56px 48px',
+          background: '#060608',
+          padding: 'clamp(48px, 6vw, 80px) clamp(20px, 4vw, 56px) clamp(32px, 4vw, 48px)',
           borderTop: '1px solid rgba(255,255,255,0.06)',
         }}
       >
@@ -1367,24 +1487,25 @@ function App() {
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))',
             gap: '48px',
-            marginBottom: '64px',
+            marginBottom: '56px',
           }}
         >
           {/* Brand */}
           <div>
             <p
               style={{
-                fontSize: '13px',
-                fontWeight: 600,
-                letterSpacing: '0.1em',
+                fontSize: '14px',
+                fontWeight: 700,
+                letterSpacing: '0.12em',
                 color: '#fff',
                 marginBottom: '16px',
+                fontFamily: "'Syne', sans-serif",
               }}
             >
               HARRY CHAN
             </p>
-            <p style={{ fontSize: '14.6px', color: 'rgba(255,255,255,0.4)', lineHeight: 1.7, maxWidth: '200px' }}>
-              Crafting premium digital experiences that make it real.
+            <p style={{ fontSize: '14px', color: 'rgba(255,255,255,0.35)', lineHeight: 1.7, maxWidth: '220px' }}>
+              Crafting digital experiences that bring customers to your door.
             </p>
           </div>
 
@@ -1392,9 +1513,9 @@ function App() {
           <div>
             <p
               style={{
-                fontSize: '11.8px',
-                fontWeight: 400,
-                color: 'rgba(255,255,255,0.4)',
+                fontSize: '11px',
+                fontWeight: 600,
+                color: 'rgba(255,255,255,0.35)',
                 letterSpacing: '0.1em',
                 textTransform: 'uppercase',
                 marginBottom: '20px',
@@ -1402,20 +1523,20 @@ function App() {
             >
               Work
             </p>
-            {['Portfolio', 'Case Studies', 'Process', 'Results'].map(link => (
+            {['Portfolio', 'Case Studies', 'Results'].map(link => (
               <a
                 key={link}
-                href="#"
+                href="#work"
                 style={{
                   display: 'block',
-                  fontSize: '14.6px',
-                  color: 'rgba(255,255,255,0.6)',
+                  fontSize: '14px',
+                  color: 'rgba(255,255,255,0.5)',
                   textDecoration: 'none',
-                  lineHeight: 2,
+                  lineHeight: 2.2,
                   transition: 'color 0.2s ease',
                 }}
                 onMouseEnter={e => (e.currentTarget.style.color = '#fff')}
-                onMouseLeave={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.6)')}
+                onMouseLeave={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.5)')}
               >
                 {link}
               </a>
@@ -1426,9 +1547,9 @@ function App() {
           <div>
             <p
               style={{
-                fontSize: '11.8px',
-                fontWeight: 400,
-                color: 'rgba(255,255,255,0.4)',
+                fontSize: '11px',
+                fontWeight: 600,
+                color: 'rgba(255,255,255,0.35)',
                 letterSpacing: '0.1em',
                 textTransform: 'uppercase',
                 marginBottom: '20px',
@@ -1436,20 +1557,20 @@ function App() {
             >
               Services
             </p>
-            {['Web Design', 'Development', 'Brand Identity', 'Motion Design'].map(link => (
+            {['Website Design', 'AI Phone Reception', 'Booking Systems'].map(link => (
               <a
                 key={link}
                 href="#services"
                 style={{
                   display: 'block',
-                  fontSize: '14.6px',
-                  color: 'rgba(255,255,255,0.6)',
+                  fontSize: '14px',
+                  color: 'rgba(255,255,255,0.5)',
                   textDecoration: 'none',
-                  lineHeight: 2,
+                  lineHeight: 2.2,
                   transition: 'color 0.2s ease',
                 }}
                 onMouseEnter={e => (e.currentTarget.style.color = '#fff')}
-                onMouseLeave={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.6)')}
+                onMouseLeave={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.5)')}
               >
                 {link}
               </a>
@@ -1460,9 +1581,9 @@ function App() {
           <div>
             <p
               style={{
-                fontSize: '11.8px',
-                fontWeight: 400,
-                color: 'rgba(255,255,255,0.4)',
+                fontSize: '11px',
+                fontWeight: 600,
+                color: 'rgba(255,255,255,0.35)',
                 letterSpacing: '0.1em',
                 textTransform: 'uppercase',
                 marginBottom: '20px',
@@ -1470,28 +1591,35 @@ function App() {
             >
               Connect
             </p>
-            {['Email', 'LinkedIn', 'Dribbble', 'Instagram'].map(link => (
+            {[
+              { label: 'WhatsApp', href: 'https://wa.me/447442242155' },
+              { label: 'Email', href: 'mailto:harrychanex@gmail.com' },
+              { label: 'Instagram', href: '#' },
+              { label: 'LinkedIn', href: '#' },
+            ].map(link => (
               <a
-                key={link}
-                href="#"
+                key={link.label}
+                href={link.href}
+                target={link.href.startsWith('http') ? '_blank' : undefined}
+                rel={link.href.startsWith('http') ? 'noopener noreferrer' : undefined}
                 style={{
                   display: 'block',
-                  fontSize: '14.6px',
-                  color: 'rgba(255,255,255,0.6)',
+                  fontSize: '14px',
+                  color: 'rgba(255,255,255,0.5)',
                   textDecoration: 'none',
-                  lineHeight: 2,
+                  lineHeight: 2.2,
                   transition: 'color 0.2s ease',
                 }}
                 onMouseEnter={e => (e.currentTarget.style.color = '#fff')}
-                onMouseLeave={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.6)')}
+                onMouseLeave={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.5)')}
               >
-                {link}
+                {link.label}
               </a>
             ))}
           </div>
         </div>
 
-        {/* Bottom copyright */}
+        {/* Copyright */}
         <div
           style={{
             maxWidth: '1120px',
@@ -1499,17 +1627,16 @@ function App() {
             paddingTop: '24px',
             borderTop: '1px solid rgba(255,255,255,0.06)',
             display: 'flex',
-            flexDirection: 'row' as const,
-            flexWrap: 'wrap' as const,
+            flexWrap: 'wrap',
             justifyContent: 'space-between',
             gap: '12px',
           }}
         >
-          <span style={{ fontSize: '13px', color: 'rgba(255,255,255,0.3)' }}>
+          <span style={{ fontSize: '13px', color: 'rgba(255,255,255,0.25)' }}>
             &copy; 2026 Harry Chan. All rights reserved.
           </span>
-          <span style={{ fontSize: '13px', color: 'rgba(255,255,255,0.3)' }}>
-            Made with care in Hong Kong.
+          <span style={{ fontSize: '13px', color: 'rgba(255,255,255,0.25)' }}>
+            Built in Cambridge, UK.
           </span>
         </div>
       </footer>
