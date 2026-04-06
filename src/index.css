@@ -6,7 +6,7 @@
 
 @layer base {
   :root {
-    --background: 0 0% 3%;
+    --background: 0 0% 0%;
     --foreground: 0 0% 95%;
     --card: 0 0% 4%;
     --card-foreground: 0 0% 95%;
@@ -19,7 +19,6 @@
     --border: 0 0% 10%;
     --ring: 0 0% 95%;
     --radius: 0px;
-    --accent: 151 100% 45%;
   }
 }
 
@@ -33,17 +32,17 @@
   body {
     @apply bg-background text-foreground antialiased;
     font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-    background-color: #0a0a0f;
+    background-color: #000;
     overflow-x: hidden;
   }
 }
 
 ::-webkit-scrollbar { width: 3px; }
-::-webkit-scrollbar-track { background: #0a0a0f; }
+::-webkit-scrollbar-track { background: #000; }
 ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.06); }
 ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.12); }
 
 ::selection {
-  background: rgba(0,232,123,0.25);
+  background: rgba(255,255,255,0.15);
   color: #fff;
 }
