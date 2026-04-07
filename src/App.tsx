@@ -1,11 +1,13 @@
-import { useEffect, useRef, useState, useCallback } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import {
   ChevronLeft, ChevronRight, Menu, X, Plus, Minus, ChevronDown,
-  Monitor, Phone, Calendar, ArrowRight,
+  Monitor, Phone, Calendar,
   MessageCircle, Mail,
 } from 'lucide-react';
+import { motion, useReducedMotion } from 'motion/react';
+import { FeatureCard } from '@/components/ui/grid-feature-cards';
 import './App.css';
 
 gsap.registerPlugin(ScrollTrigger);
@@ -91,6 +93,54 @@ const aiSteps = [
   { num: '03', title: 'Bookings flow in automatically', desc: 'WhatsApp confirmations, email alerts, calendar sync.' },
   { num: '04', title: 'Complex calls go to you', desc: 'Complaints and special requests are forwarded to your mobile.' },
 ];
+
+/* ─── Service Features for FeatureCard grid ─── */
+const serviceFeatures = [
+  {
+    title: 'Website Design & Redesign',
+    icon: Monitor,
+    description: 'A stunning website that works as hard as you do. Designed to convert visitors into paying customers — not just look pretty. From £1,500.',
+  },
+  {
+    title: 'AI Phone Reception',
+    icon: Phone,
+    description: 'An AI receptionist that answers your phone 24/7, books tables and appointments, and never calls in sick. From £149/mo.',
+  },
+  {
+    title: 'Booking & Management Systems',
+    icon: Calendar,
+    description: 'Let customers book online without calling. Reduce no-shows with automatic reminders. From £99/mo.',
+  },
+];
+
+/* ─── AnimatedContainer (motion) ─── */
+function AnimatedContainer({
+  className,
+  delay = 0.1,
+  children,
+}: {
+  delay?: number;
+  className?: string;
+  children: React.ReactNode;
+}) {
+  const shouldReduceMotion = useReducedMotion();
+
+  if (shouldReduceMotion) {
+    return <>{children}</>;
+  }
+
+  return (
+    <motion.div
+      initial={{ filter: 'blur(4px)', translateY: -8, opacity: 0 }}
+      whileInView={{ filter: 'blur(0px)', translateY: 0, opacity: 1 }}
+      viewport={{ once: true }}
+      transition={{ delay, duration: 0.8 }}
+      className={className}
+    >
+      {children}
+    </motion.div>
+  );
+}
 
 /* ─── Globe Canvas Component ─── */
 function GlobeCanvas() {
@@ -927,7 +977,7 @@ function App() {
       </section>
 
       {/* ═══════════════════════════════════════════
-          SERVICES
+          SERVICES — FeatureCard Grid
       ═══════════════════════════════════════════ */}
       <section
         ref={servicesRef}
@@ -938,130 +988,33 @@ function App() {
           borderTop: '1px solid rgba(255,255,255,0.06)',
         }}
       >
-        <div style={{ maxWidth: '1120px', margin: '0 auto' }}>
-          <div className="services-header" style={{ textAlign: 'center', marginBottom: 'clamp(40px, 5vw, 64px)' }}>
+        <div className="mx-auto w-full max-w-5xl space-y-8">
+          <AnimatedContainer className="mx-auto max-w-3xl text-center services-header">
             <h2
               style={{
                 fontSize: 'clamp(28px, 4vw, 48px)',
                 fontWeight: 700,
                 fontFamily: "'Syne', sans-serif",
                 letterSpacing: '-0.03em',
-                color: '#fff',
                 lineHeight: 1.1,
-                marginBottom: '12px',
               }}
+              className="text-balance"
             >
               Three ways I grow your business
             </h2>
-            <p style={{ fontSize: '15px', color: 'rgba(255,255,255,0.4)', maxWidth: '520px', margin: '0 auto' }}>
+            <p className="text-muted-foreground mt-4 text-sm tracking-wide text-balance md:text-base">
               No jargon. No fluff. Just tools that bring you more customers and save you money.
             </p>
-          </div>
+          </AnimatedContainer>
 
-          <div
-            className="services-grid"
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 320px), 1fr))',
-              gap: '20px',
-            }}
+          <AnimatedContainer
+            delay={0.4}
+            className="grid grid-cols-1 divide-x divide-y divide-dashed border border-dashed sm:grid-cols-2 md:grid-cols-3 services-grid"
           >
-            {/* Card 1: Website */}
-            <div className="service-card">
-              <div style={{ marginBottom: '20px', color: 'rgba(255,255,255,0.5)' }}>
-                <Monitor size={28} strokeWidth={1.5} />
-              </div>
-              <h3 style={{ fontSize: '22px', fontWeight: 700, fontFamily: "'Syne', sans-serif", color: '#fff', letterSpacing: '-0.02em', marginBottom: '12px' }}>
-                Website Design &amp; Redesign
-              </h3>
-              <p style={{ fontSize: '14px', color: 'rgba(255,255,255,0.5)', lineHeight: 1.7, marginBottom: '20px' }}>
-                A stunning website that works as hard as you do. Designed to convert visitors into paying customers &mdash; not just look pretty.
-              </p>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '24px' }}>
-                {['Custom design', 'Mobile-optimised', 'SEO basics', 'Google Business'].map(item => (
-                  <span key={item} style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', padding: '4px 10px', borderRadius: '9999px', border: '1px solid rgba(255,255,255,0.08)' }}>
-                    {item}
-                  </span>
-                ))}
-              </div>
-              <div style={{ fontSize: '20px', fontWeight: 700, fontFamily: "'Syne', sans-serif", color: '#fff' }}>
-                From &pound;1,500
-              </div>
-            </div>
-
-            {/* Card 2: AI Reception (Featured) */}
-            <div className="service-card featured">
-              <div
-                style={{
-                  position: 'absolute',
-                  top: '-1px',
-                  right: '24px',
-                  background: '#fff',
-                  color: '#000',
-                  fontSize: '10px',
-                  fontWeight: 700,
-                  letterSpacing: '0.06em',
-                  padding: '6px 14px',
-                  borderRadius: '0 0 8px 8px',
-                  textTransform: 'uppercase',
-                }}
-              >
-                NEW &mdash; Most Popular
-              </div>
-              <div style={{ marginBottom: '20px', color: 'rgba(255,255,255,0.7)' }}>
-                <Phone size={28} strokeWidth={1.5} />
-              </div>
-              <h3 style={{ fontSize: '22px', fontWeight: 700, fontFamily: "'Syne', sans-serif", color: '#fff', letterSpacing: '-0.02em', marginBottom: '12px' }}>
-                AI Phone Reception
-              </h3>
-              <p style={{ fontSize: '14px', color: 'rgba(255,255,255,0.5)', lineHeight: 1.7, marginBottom: '20px' }}>
-                An AI receptionist that answers your phone 24/7, books tables and appointments, and never calls in sick. Your staff can choose not to answer &mdash; AI never does.
-              </p>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '24px' }}>
-                {['24/7 answering', 'Auto bookings', 'WhatsApp alerts', 'Monthly reports'].map(item => (
-                  <span key={item} style={{ fontSize: '11px', color: 'rgba(255,255,255,0.5)', padding: '4px 10px', borderRadius: '9999px', border: '1px solid rgba(255,255,255,0.1)' }}>
-                    {item}
-                  </span>
-                ))}
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
-                <span style={{ fontSize: '20px', fontWeight: 700, fontFamily: "'Syne', sans-serif", color: '#fff' }}>
-                  From &pound;149/mo
-                </span>
-                <a
-                  href="#ai-reception"
-                  style={{ fontSize: '13px', fontWeight: 500, color: 'rgba(255,255,255,0.5)', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '4px', transition: 'color 0.2s ease' }}
-                  onMouseEnter={e => (e.currentTarget.style.color = '#fff')}
-                  onMouseLeave={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.5)')}
-                >
-                  Learn more <ArrowRight size={14} />
-                </a>
-              </div>
-            </div>
-
-            {/* Card 3: Booking */}
-            <div className="service-card">
-              <div style={{ marginBottom: '20px', color: 'rgba(255,255,255,0.5)' }}>
-                <Calendar size={28} strokeWidth={1.5} />
-              </div>
-              <h3 style={{ fontSize: '22px', fontWeight: 700, fontFamily: "'Syne', sans-serif", color: '#fff', letterSpacing: '-0.02em', marginBottom: '12px' }}>
-                Booking &amp; Management Systems
-              </h3>
-              <p style={{ fontSize: '14px', color: 'rgba(255,255,255,0.5)', lineHeight: 1.7, marginBottom: '20px' }}>
-                Let customers book online without calling. Reduce no-shows with automatic reminders. Works for restaurants, salons, and any appointment-based business.
-              </p>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '24px' }}>
-                {['Online booking', 'Calendar sync', 'Auto reminders', 'Customer database'].map(item => (
-                  <span key={item} style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', padding: '4px 10px', borderRadius: '9999px', border: '1px solid rgba(255,255,255,0.08)' }}>
-                    {item}
-                  </span>
-                ))}
-              </div>
-              <div style={{ fontSize: '20px', fontWeight: 700, fontFamily: "'Syne', sans-serif", color: '#fff' }}>
-                From &pound;99/mo
-              </div>
-            </div>
-          </div>
+            {serviceFeatures.map((feature, i) => (
+              <FeatureCard key={i} feature={feature} />
+            ))}
+          </AnimatedContainer>
         </div>
       </section>
 
